@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: syncthing-gui
+spec:
+  type: ClusterIP
+  selector:
+    app: syncthing
+  ports:
+    - name: gui
+      port: 8384
+      targetPort: 8384
+    - name: sync-tcp
+      port: 22000
+      targetPort: 22000

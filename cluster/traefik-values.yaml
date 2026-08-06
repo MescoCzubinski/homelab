@@ -1,0 +1,11 @@
+service:
+  spec:
+    externalTrafficPolicy: Local
+
+ports:
+  syncthing-tcp:
+    port: 22000
+    expose:
+      default: true
+    exposedPort: 22000
+    protocol: TCP
