@@ -1,0 +1,11 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteUDP
+metadata:
+  name: pihole-dns-udp
+spec:
+  entryPoints:
+    - pihole-udp
+  routes:
+    - services:
+        - name: pihole
+          port: 53

@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pihole
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: default-vpn-only@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: pihole.czubinski.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pihole
+                port:
+                  number: 80
