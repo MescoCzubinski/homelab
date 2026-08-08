@@ -1,11 +1,17 @@
 service:
   spec:
+    type: NodePort
     externalTrafficPolicy: Local
 
 ports:
+  web:
+    nodePort: 30001
+  websecure:
+    nodePort: 30002
   syncthing-tcp:
     port: 22000
     expose:
       default: true
     exposedPort: 22000
     protocol: TCP
+    nodePort: 30022
