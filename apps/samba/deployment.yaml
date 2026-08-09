@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: samba
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: samba
+  template:
+    metadata:
+      labels:
+        app: samba
+    spec:
+      containers:
+        - name: samba
+          image: ghcr.io/servercontainers/samba:smbd-only-latest
+          env:
+            - name: TZ
+              value: Europe/Warsaw
+            - name: ACCOUNT_myServer
+              valueFrom:
+                secretKeyRef:
+                  name: samba-password
+                  key: password
+            - name: SAMBA_VOLUME_CONFIG_shared
+              value: "[Shared]; path=/shares/Shared; valid users = myServer; guest ok = no; read only = no; browseable = yes"
+          ports:
+            - containerPort: 445
+          volumeMounts:
+            - name: shared
+              mountPath: /shares/Shared
+      volumes:
+        - name: shared
+          hostPath:
+            path: /home/server/samba/Shared
+            type: DirectoryOrCreate

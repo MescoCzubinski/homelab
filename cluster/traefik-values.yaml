@@ -15,3 +15,10 @@ ports:
     exposedPort: 22000
     protocol: TCP
     nodePort: 30022
+  samba-tcp:
+    port: 445
+    expose:
+      default: true
+    exposedPort: 445
+    protocol: TCP
+    nodePort: 30445
