@@ -11,4 +11,4 @@ spec:
         - name: pihole
           port: 53
       middlewares:
-        - name: vpn-only-tcp
+        - name: tcp-vpn-only

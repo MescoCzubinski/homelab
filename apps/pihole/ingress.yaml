@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: pihole
   annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: default-vpn-only@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: default-http-vpn-only@kubernetescrd
 spec:
   ingressClassName: traefik
   rules:
