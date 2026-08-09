@@ -11,11 +11,6 @@ data:
             <device id="5SWC46N-Z3JIGQ2-3U2XH77-KOCOUW3-UJ674QT-THR555H-UAN2DVG-H6XU4AO"/>
             <device id="IFW3ZPK-FGBR63F-ZEKRKF3-EHZA2YU-65M2N2V-KXLSI5P-E4OHPNW-675ABAP"/>
         </folder>
-        <folder id="Shared" label="Shared" path="/var/syncthing/data/Shared" type="sendreceive">
-            <device id="5SWC46N-Z3JIGQ2-3U2XH77-KOCOUW3-UJ674QT-THR555H-UAN2DVG-H6XU4AO"/>
-            <device id="IFW3ZPK-FGBR63F-ZEKRKF3-EHZA2YU-65M2N2V-KXLSI5P-E4OHPNW-675ABAP"/>
-            <device id="J22COXJ-OIFALUG-ZQEJIHV-RALME62-QRPFDTW-GW35ZBK-W23T3L4-LUJSJAG"/>
-        </folder>
         <folder id="Memes" label="Memes" path="/var/syncthing/data/Memes" type="sendreceive">
             <device id="J22COXJ-OIFALUG-ZQEJIHV-RALME62-QRPFDTW-GW35ZBK-W23T3L4-LUJSJAG"/>
         </folder>
