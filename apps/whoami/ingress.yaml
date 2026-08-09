@@ -3,11 +3,11 @@ kind: Ingress
 metadata:
   name: whoami
   annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: default-vpn-only@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: default-http-vpn-only@kubernetescrd
 spec:
   ingressClassName: traefik
   rules:
-    - host: whoami.home
+    - host: whoami.czubinski.dev
       http:
         paths:
           - path: /

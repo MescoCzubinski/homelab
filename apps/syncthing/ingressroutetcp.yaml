@@ -11,4 +11,4 @@ spec:
         - name: syncthing-gui
           port: 22000
       middlewares:
-        - name: vpn-only-tcp
+        - name: tcp-vpn-only

@@ -3,11 +3,11 @@ kind: Ingress
 metadata:
   name: syncthing
   annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: default-vpn-only@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: default-http-vpn-only@kubernetescrd
 spec:
   ingressClassName: traefik
   rules:
-    - host: syncthing.home
+    - host: syncthing.czubinski.dev
       http:
         paths:
           - path: /
