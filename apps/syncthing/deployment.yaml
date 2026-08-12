@@ -35,3 +35,9 @@ spec:
         - name: config
           hostPath:
             path: /home/server/syncthing/config
+        - name: data
+          hostPath:
+            path: /home/server/syncthing/data
+        - name: config-xml
+          configMap:
+            name: syncthing-config
