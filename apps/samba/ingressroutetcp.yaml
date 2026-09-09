@@ -11,4 +11,4 @@ spec:
         - name: samba
           port: 445
       middlewares:
-        - name: vpn-only-tcp
+        - name: tcp-vpn-only
