@@ -12,6 +12,35 @@ spec:
       labels:
         app: syncthing
     spec:
+      initContainers:
+        - name: syncthing-gui-auth
+          image: syncthing/syncthing:latest
+          command:
+            - sh
+            - -c
+            - cp /config-template/config.xml /var/syncthing/config/config.xml && syncthing generate --config=/var/syncthing/config --data=/var/syncthing/data --gui-user="$SYNCTHING_USER" --gui-password="$SYNCTHING_PASSWORD"
+          env:
+            - name: STHOMEDIR
+              value: ""
+            - name: SYNCTHING_USER
+              valueFrom:
+                secretKeyRef:
+                  name: syncthing-password
+                  key: username
+            - name: SYNCTHING_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: syncthing-password
+                  key: password
+          volumeMounts:
+            - name: config
+              mountPath: /var/syncthing/config
+            - name: data
+              mountPath: /var/syncthing/data
+            - name: config-template
+              mountPath: /config-template/config.xml
+              subPath: config.xml
+              readOnly: true
       containers:
         - name: syncthing
           image: syncthing/syncthing:latest
@@ -28,9 +57,6 @@ spec:
               mountPath: /var/syncthing/config
             - name: data
               mountPath: /var/syncthing/data
-            - name: config-xml
-              mountPath: /var/syncthing/config/config.xml
-              subPath: config.xml
       volumes:
         - name: config
           hostPath:
@@ -38,6 +64,6 @@ spec:
         - name: data
           hostPath:
             path: /home/server/syncthing/data
-        - name: config-xml
+        - name: config-template
           configMap:
             name: syncthing-config
