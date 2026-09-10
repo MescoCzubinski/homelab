@@ -8,6 +8,13 @@ ports:
     nodePort: 30001
   websecure:
     nodePort: 30002
+    http:
+      tls:
+        certResolver: letsencrypt
+        domains:
+          - main: czubinski.dev
+            sans:
+              - "*.czubinski.dev"
   syncthing-tcp:
     port: 22000
     expose:
@@ -22,3 +29,41 @@ ports:
     exposedPort: 445
     protocol: TCP
     nodePort: 30445
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: REMOVED
+      storage: /data/acme.json
+      dnsChallenge:
+        provider: cloudflare
+        resolvers:
+          - "1.1.1.1:53"
+          - "1.0.0.1:53"
+
+env:
+  - name: CF_DNS_API_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: cloudflare-dns-token
+        key: CF_DNS_API_TOKEN
+
+persistence:
+  enabled: true
+  existingClaim: traefik-acme
+  path: /data
+
+deployment:
+  initContainers:
+    - name: acme-permissions
+      image: busybox:1.37
+      command:
+        - sh
+        - -c
+        - touch /data/acme.json && chown 65532:65532 /data/acme.json && chmod 600 /data/acme.json
+      securityContext:
+        runAsUser: 0
+        runAsNonRoot: false
+      volumeMounts:
+        - name: data
+          mountPath: /data
