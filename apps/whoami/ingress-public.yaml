@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: whoami-public
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: public
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: test.czubinski.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: whoami
+                port:
+                  number: 80
