@@ -1,13 +1,14 @@
 service:
-  spec:
-    type: NodePort
-    externalTrafficPolicy: Local
+  enabled: true
+  type: ClusterIP
 
 ports:
   web:
-    nodePort: 30001
+    port: 8000
+    hostPort: 80
   websecure:
-    nodePort: 30002
+    port: 8443
+    hostPort: 443
     http:
       tls:
         certResolver: letsencrypt
@@ -15,20 +16,18 @@ ports:
           - main: czubinski.dev
             sans:
               - "*.czubinski.dev"
+  public:
+    port: 9000
+    expose:
+      default: false
   syncthing-tcp:
     port: 22000
-    expose:
-      default: true
-    exposedPort: 22000
+    hostPort: 22000
     protocol: TCP
-    nodePort: 30022
   samba-tcp:
     port: 445
-    expose:
-      default: true
-    exposedPort: 445
+    hostPort: 445
     protocol: TCP
-    nodePort: 30445
 
 certificatesResolvers:
   letsencrypt:
