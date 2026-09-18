@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: git@github.com:MescoCzubinski/myServer.git
+    repoURL: git@github.com:MescoCzubinski/homelab.git
     targetRevision: main
     path: .
     directory:
