@@ -18,7 +18,7 @@ spec:
           command:
             - sh
             - -c
-            - cp /config-template/config.xml /var/syncthing/config/config.xml && syncthing generate --config=/var/syncthing/config --data=/var/syncthing/data --gui-user="$SYNCTHING_USER" --gui-password="$SYNCTHING_PASSWORD"
+            - cp /config-template/config.xml /var/syncthing/config/config.xml && printf '%s' "$SYNCTHING_PASSWORD" | syncthing generate --config=/var/syncthing/config --data=/var/syncthing/data --gui-user="$SYNCTHING_USER" --gui-password=-
           env:
             - name: STHOMEDIR
               value: ""
