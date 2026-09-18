@@ -1,6 +1,7 @@
 service:
   enabled: true
-  type: ClusterIP
+  spec:
+    type: ClusterIP
 
 ports:
   web:
@@ -17,9 +18,13 @@ ports:
             sans:
               - "*.czubinski.dev"
   public:
-    port: 9000
+    port: 8001
+    exposedPort: 8080
+    forwardedHeaders:
+      trustedIPs:
+        - 10.244.0.0/16
     expose:
-      default: false
+      default: true
   syncthing-tcp:
     port: 22000
     hostPort: 22000
@@ -51,6 +56,12 @@ persistence:
   enabled: true
   existingClaim: traefik-acme
   path: /data
+
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 1
+    maxSurge: 0
 
 deployment:
   initContainers:
