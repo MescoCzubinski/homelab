@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
   name: beszel-hub
   annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.middlewares: default-http-vpn-only@kubernetescrd
 spec:
   ingressClassName: traefik
