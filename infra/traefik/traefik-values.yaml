@@ -10,6 +10,7 @@ ports:
   websecure:
     port: 8443
     hostPort: 443
+    asDefault: true
     http:
       tls:
         certResolver: letsencrypt
