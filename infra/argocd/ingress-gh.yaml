@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd-server-gh
+  namespace: argocd
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: public
+    traefik.ingress.kubernetes.io/router.middlewares: default-http-gh-only@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: argocd.czubinski.dev
+      http:
+        paths:
+          - path: /api/webhook
+            pathType: Exact
+            backend:
+              service:
+                name: argocd-server
+                port:
+                  name: http
