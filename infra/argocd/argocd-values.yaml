@@ -1,0 +1,12 @@
+global:
+  domain: argocd.czubinski.dev
+
+configs:
+  params:
+    server.insecure: true
+
+dex:
+  enabled: false
+
+notifications:
+  enabled: false

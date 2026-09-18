@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: homelab
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:MescoCzubinski/myServer.git
+    targetRevision: main
+    path: .
+    directory:
+      recurse: true
+      exclude: "{infra/argocd/application-homelab.yaml,infra/k0s.yaml,infra/traefik/traefik-values.yaml,infra/argocd/argocd-values.yaml}"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
