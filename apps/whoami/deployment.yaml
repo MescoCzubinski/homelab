@@ -12,6 +12,7 @@ spec:
       labels:
         app: whoami
     spec:
+      enableServiceLinks: false
       containers:
         - name: whoami
           image: traefik/whoami

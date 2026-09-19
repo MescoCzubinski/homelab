@@ -7,11 +7,11 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: test.czubinski.dev
+    - host: whoami.czubinski.dev
       http:
         paths:
           - path: /
-            pathType: Prefix
+            pathType: Exact
             backend:
               service:
                 name: whoami
