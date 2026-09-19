@@ -13,4 +13,4 @@ spec:
       - 2a0a:a440::/29
       - 2606:50c0::/32
     ipStrategy:
-      depth: 2
+      depth: 1
