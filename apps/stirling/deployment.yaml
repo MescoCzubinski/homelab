@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stirling
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stirling
+  template:
+    metadata:
+      labels:
+        app: stirling
+    spec:
+      containers:
+        - name: stirling
+          image: stirlingtools/stirling-pdf:latest
+          env:
+            - name: SECURITY_ENABLELOGIN
+              value: "false"
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: config
+              mountPath: /configs
+      volumes:
+        - name: config
+          hostPath:
+            path: /home/server/stirling/config
+            type: DirectoryOrCreate
