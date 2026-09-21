@@ -13,7 +13,6 @@ providers:
 ports:
   web: null
   websecure:
-    port: 8443
     hostPort: 443
     hostIP: 192.168.0.1
     asDefault: true

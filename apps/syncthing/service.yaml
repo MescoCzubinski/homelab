@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: syncthing-gui
+  name: syncthing
 spec:
   type: ClusterIP
   selector:
