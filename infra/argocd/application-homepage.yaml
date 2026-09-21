@@ -1,17 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: homelab
+  name: homepage
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: git@github.com:MescoCzubinski/homelab.git
     targetRevision: main
-    path: .
-    directory:
-      recurse: true
-      exclude: "{infra/argocd/application-homelab.yaml,infra/k0s.yaml,infra/traefik/traefik-values.yaml,infra/argocd/argocd-values.yaml,apps/homepage/*}"
+    path: apps/homepage
   destination:
     server: https://kubernetes.default.svc
     namespace: default
