@@ -11,7 +11,7 @@ spec:
     path: .
     directory:
       recurse: true
-      include: "{apps/beszel/*,apps/convertx/*,apps/samba/*,apps/stirling/*,apps/syncthing/*,infra/*/application.yaml,infra/argocd/ingress-gh.yaml,infra/argocd/ingress-gui.yaml,infra/cloudflared/*,infra/middleware/*,infra/traefik/volume-acme.yaml}"
+      include: "{apps/beszel/*,apps/convertx/*,apps/samba/*,apps/stirling/*,apps/syncthing/*,infra/*/application.yaml,infra/argocd/ingress-gh.yaml,infra/argocd/ingress-gui.yaml,infra/cloudflared/*,infra/middleware/*,infra/traefik/volume-acme.yaml,infra/traefik/sealed-secret.yaml}"
   destination:
     server: https://kubernetes.default.svc
     namespace: default

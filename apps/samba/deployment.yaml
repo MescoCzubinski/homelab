@@ -19,13 +19,13 @@ spec:
           env:
             - name: TZ
               value: Europe/Warsaw
-            - name: ACCOUNT_myServer
+            - name: ACCOUNT_admin
               valueFrom:
                 secretKeyRef:
                   name: samba-password
                   key: password
             - name: SAMBA_VOLUME_CONFIG_shared
-              value: "[Shared]; path=/shares/Shared; valid users = myServer; guest ok = no; read only = no; browseable = yes"
+              value: "[Shared]; path=/shares/Shared; valid users = admin; guest ok = no; read only = no; browseable = yes"
           ports:
             - containerPort: 445
           volumeMounts:
