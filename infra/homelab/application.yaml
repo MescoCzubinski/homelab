@@ -11,7 +11,7 @@ spec:
     path: .
     directory:
       recurse: true
-      exclude: "{infra/argocd/application-homelab.yaml,infra/k0s.yaml,infra/traefik/traefik-values.yaml,infra/argocd/argocd-values.yaml,apps/homepage/*}"
+      include: "{apps/beszel/*,apps/convertx/*,apps/samba/*,apps/stirling/*,apps/syncthing/*,infra/*/application.yaml,infra/argocd/ingress-gh.yaml,infra/argocd/ingress-gui.yaml,infra/cloudflared/deployment.yaml,infra/middleware/*,infra/traefik/volume-acme.yaml}"
   destination:
     server: https://kubernetes.default.svc
     namespace: default
