@@ -44,3 +44,4 @@ data:
 kind: ConfigMap
 metadata:
   name: syncthing-config
+  namespace: syncthing
