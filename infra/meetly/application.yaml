@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: meetly
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:MescoCzubinski/homelab.git
+    targetRevision: main
+    path: apps/meetly
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: meetly
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

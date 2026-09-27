@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: meetly-backend
+  namespace: meetly
+spec:
+  selector:
+    app: meetly-backend
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: meetly-frontend
+  namespace: meetly
+spec:
+  selector:
+    app: meetly-frontend
+  ports:
+    - port: 3000
+      targetPort: 3000
