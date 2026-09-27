@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meetly-backend
+  namespace: meetly
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: meetly-backend
+  template:
+    metadata:
+      labels:
+        app: meetly-backend
+    spec:
+      imagePullSecrets:
+        - name: ghcr-pull
+      containers:
+        - name: meetly-backend
+          image: ghcr.io/mescoczubinski/meetly-backend:latest
+          imagePullPolicy: Always
+          env:
+            - name: CORS_ORIGIN
+              value: https://meetly.czubinski.dev
+          ports:
+            - containerPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meetly-frontend
+  namespace: meetly
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: meetly-frontend
+  template:
+    metadata:
+      labels:
+        app: meetly-frontend
+    spec:
+      imagePullSecrets:
+        - name: ghcr-pull
+      containers:
+        - name: meetly-frontend
+          image: ghcr.io/mescoczubinski/meetly-frontend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
