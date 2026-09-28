@@ -20,8 +20,15 @@ spec:
           image: ghcr.io/mescoczubinski/meetly-backend:latest
           imagePullPolicy: Always
           env:
+            - name: PORT
+              value: "8080"
             - name: CORS_ORIGIN
               value: https://meetly.czubinski.dev
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: meetly-jwt
+                  key: JWT_SECRET
           ports:
             - containerPort: 8080
 ---
