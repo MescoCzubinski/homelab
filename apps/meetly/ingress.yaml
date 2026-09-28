@@ -32,6 +32,20 @@ spec:
                 name: meetly-backend
                 port:
                   number: 8080
+          - path: /interests
+            pathType: Prefix
+            backend:
+              service:
+                name: meetly-backend
+                port:
+                  number: 8080
+          - path: /messages
+            pathType: Prefix
+            backend:
+              service:
+                name: meetly-backend
+                port:
+                  number: 8080
           - path: /
             pathType: Prefix
             backend:
