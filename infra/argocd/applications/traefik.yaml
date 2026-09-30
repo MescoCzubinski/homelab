@@ -20,7 +20,7 @@ spec:
       targetRevision: main
       path: infra/traefik
       directory:
-        include: "{namespace.yaml,volume-acme.yaml,sealed-secret.yaml}"
+        include: "{namespace.yaml,volume-acme.yaml,sealed-secret.yaml,middleware-*.yaml}"
   destination:
     server: https://kubernetes.default.svc
     namespace: traefik

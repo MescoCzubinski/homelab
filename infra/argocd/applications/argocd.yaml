@@ -20,7 +20,8 @@ spec:
       targetRevision: main
       path: infra/argocd
       directory:
-        include: "ingress-*.yaml"
+        recurse: true
+        include: "{ingress-*.yaml,applications/*}"
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
