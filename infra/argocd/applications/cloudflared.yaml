@@ -1,20 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: homelab
+  name: cloudflared
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: git@github.com:MescoCzubinski/homelab.git
     targetRevision: main
-    path: .
-    directory:
-      recurse: true
-      include: "{apps/beszel/*,apps/convertx/*,apps/samba/*,apps/stirling/*,apps/syncthing/*,infra/*/application.yaml,infra/cloudflared/*,infra/middleware/*}"
+    path: infra/cloudflared
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: cloudflared
   syncPolicy:
     automated:
       prune: true
