@@ -16,6 +16,11 @@ spec:
     - repoURL: git@github.com:MescoCzubinski/homelab.git
       targetRevision: main
       ref: values
+    - repoURL: git@github.com:MescoCzubinski/homelab.git
+      targetRevision: main
+      path: infra/sealed-secrets
+      directory:
+        include: "namespace.yaml"
   destination:
     server: https://kubernetes.default.svc
     namespace: sealed-secrets
@@ -23,5 +28,3 @@ spec:
     automated:
       prune: true
       selfHeal: true
-    syncOptions:
-      - CreateNamespace=true

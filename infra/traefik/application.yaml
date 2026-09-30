@@ -16,6 +16,11 @@ spec:
     - repoURL: git@github.com:MescoCzubinski/homelab.git
       targetRevision: main
       ref: values
+    - repoURL: git@github.com:MescoCzubinski/homelab.git
+      targetRevision: main
+      path: infra/traefik
+      directory:
+        include: "{namespace.yaml,volume-acme.yaml,sealed-secret.yaml}"
   destination:
     server: https://kubernetes.default.svc
     namespace: traefik
