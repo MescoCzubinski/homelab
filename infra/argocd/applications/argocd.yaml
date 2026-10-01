@@ -21,7 +21,7 @@ spec:
       path: infra/argocd
       directory:
         recurse: true
-        include: "{ingress-*.yaml,applications/*}"
+        include: "{ingress-*.yaml,sealed-secret.yaml,applications/*}"
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd

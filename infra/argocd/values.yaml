@@ -4,6 +4,8 @@ global:
 configs:
   params:
     server.insecure: true
+  secret:
+    githubSecret: "$argocd-webhook:github"
 
 dex:
   enabled: false

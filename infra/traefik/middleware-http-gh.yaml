@@ -14,4 +14,5 @@ spec:
       - 2a0a:a440::/29
       - 2606:50c0::/32
     ipStrategy:
-      depth: 1
+      excludedIPs:
+        - 10.244.0.0/16
