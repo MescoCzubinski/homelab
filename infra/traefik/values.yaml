@@ -15,12 +15,11 @@ providers:
 ports:
   web: null
   websecure:
+    port: 443
     hostPort: 443
     hostIP: 192.168.0.1
     asDefault: true
     http:
-      middlewares:
-        - default-http-vpn-only@kubernetescrd
       tls:
         certResolver: letsencrypt
         domains:
@@ -35,26 +34,25 @@ ports:
         - 10.244.0.0/16
     expose:
       default: true
-  syncthing-tcp:
-    port: 22000
-    hostPort: 22000
-    hostIP: 192.168.0.1
-    protocol: TCP
   samba-tcp:
     port: 445
     hostPort: 445
     hostIP: 192.168.0.1
     protocol: TCP
+  syncthing-tcp:
+    port: 22000
+    hostPort: 22000
+    hostIP: 192.168.0.1
+    protocol: TCP
 
 additionalArguments:
-  - --entryPoints.websecure.address=:8443/tcp
+  - --entryPoints.websecure.address=:443/tcp
   - --entryPoints.samba-tcp.address=:445/tcp
   - --entryPoints.syncthing-tcp.address=:22000/tcp
 
 certificatesResolvers:
   letsencrypt:
     acme:
-      email: REMOVED
       storage: /data/acme.json
       dnsChallenge:
         provider: cloudflare
