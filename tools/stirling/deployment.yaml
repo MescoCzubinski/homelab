@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: stirling
-          image: stirlingtools/stirling-pdf:latest
+          image: stirlingtools/stirling-pdf:3.0.0
           env:
             - name: SECURITY_ENABLELOGIN
               value: "false"

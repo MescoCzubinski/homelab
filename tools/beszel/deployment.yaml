@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: beszel-hub
-          image: henrygd/beszel:latest
+          image: henrygd/beszel:0.21.0
           ports:
             - containerPort: 8090
           volumeMounts:

@@ -16,7 +16,7 @@ spec:
       hostPID: true
       containers:
         - name: beszel-agent
-          image: henrygd/beszel-agent:latest
+          image: henrygd/beszel-agent:0.21.0
           env:
             - name: PORT
               value: "45876"

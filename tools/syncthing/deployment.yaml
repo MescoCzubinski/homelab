@@ -15,7 +15,7 @@ spec:
     spec:
       initContainers:
         - name: syncthing-gui-auth
-          image: syncthing/syncthing:latest
+          image: syncthing/syncthing:2.1.0
           command:
             - sh
             - -c
@@ -44,7 +44,7 @@ spec:
               readOnly: true
       containers:
         - name: syncthing
-          image: syncthing/syncthing:latest
+          image: syncthing/syncthing:2.1.0
           ports:
             - containerPort: 8384
             - containerPort: 22000
