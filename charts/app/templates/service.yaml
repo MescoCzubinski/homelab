@@ -1,0 +1,14 @@
+{{- range .Values.components }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  selector:
+    app: {{ .name }}
+  ports:
+    - port: {{ .port }}
+      targetPort: {{ .port }}
+{{- end }}

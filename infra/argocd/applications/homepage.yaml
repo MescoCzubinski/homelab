@@ -5,10 +5,22 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  source:
-    repoURL: git@github.com:MescoCzubinski/homelab.git
-    targetRevision: main
-    path: apps/homepage
+  sources:
+    - repoURL: git@github.com:MescoCzubinski/homelab.git
+      targetRevision: main
+      path: charts/app
+      helm:
+        releaseName: homepage
+        valueFiles:
+          - $values/apps/homepage/values.yaml
+    - repoURL: git@github.com:MescoCzubinski/homelab.git
+      targetRevision: main
+      ref: values
+    - repoURL: git@github.com:MescoCzubinski/homelab.git
+      targetRevision: main
+      path: apps/homepage
+      directory:
+        include: "{namespace.yaml,sealed-secret.yaml}"
   destination:
     server: https://kubernetes.default.svc
     namespace: homepage
