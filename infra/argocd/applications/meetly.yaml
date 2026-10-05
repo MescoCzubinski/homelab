@@ -5,10 +5,22 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  source:
-    repoURL: git@github.com:MescoCzubinski/homelab.git
-    targetRevision: main
-    path: apps/meetly
+  sources:
+    - repoURL: git@github.com:MescoCzubinski/homelab.git
+      targetRevision: main
+      path: charts/app
+      helm:
+        releaseName: meetly
+        valueFiles:
+          - $values/apps/meetly/values.yaml
+    - repoURL: git@github.com:MescoCzubinski/homelab.git
+      targetRevision: main
+      ref: values
+    - repoURL: git@github.com:MescoCzubinski/homelab.git
+      targetRevision: main
+      path: apps/meetly
+      directory:
+        include: "{namespace.yaml,sealed-secret.yaml}"
   destination:
     server: https://kubernetes.default.svc
     namespace: meetly

@@ -19,6 +19,8 @@ Single-node Kubernetes homelab on a Mac Mini, run with k0s and managed by Argo C
 
 ```
 cluster/          k0s cluster config
+charts/
+  app/            Helm chart for my own apps
 infra/
   argocd/         Argo CD itself + applications/
   cloudflared/    Cloudflare Tunnel
@@ -36,7 +38,7 @@ tools/            self-hosted tools
 .docs/            docs and diagrams
 ```
 
-Every app is a plain directory of manifests: `namespace.yaml`, `deployment.yaml`, `service.yaml`, `ingress.yaml` and, if needed, `sealed-secret.yaml`. Argo CD entrypoint is [infra/argocd/applications/](infra/argocd/applications/).
+Every app in `apps/` is a `values.yaml` for the shared [charts/app](charts/app/) Helm chart (Deployment, Service, Ingress), plus `namespace.yaml` and, if needed, `sealed-secret.yaml`. Every tool in `tools/` is a plain directory of manifests. Argo CD entrypoint is [infra/argocd/applications/](infra/argocd/applications/).
 
 ## Services
 
