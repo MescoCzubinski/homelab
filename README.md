@@ -10,7 +10,7 @@ Single-node Kubernetes homelab on a Mac Mini, run with k0s and managed by Argo C
 | ------------- | ------------------------------------------------------------------------------------------------------------------- |
 | Hardware      | Mac Mini 2012, i7-3720QM, 16 GB RAM, 250 GB SSD ([hardware.md](.docs/hardware.md))                                  |
 | Kubernetes    | [k0s](https://k0sproject.io), config in [cluster/k0s.yaml](cluster/k0s.yaml)                                        |
-| GitOps        | [Argo CD](https://argo-cd.readthedocs.io)                                                                           |
+| GitOps        | [Argo CD](https://argo-cd.readthedocs.io) ([argocd.md](.docs/argocd.md))                                            |
 | Ingress       | [Traefik](https://traefik.io), config in [infra/traefik/values.yaml](infra/traefik/values.yaml)                     |
 | Public access | [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) (`cloudflared`) |
 | Secrets       | [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets)                                                    |
@@ -38,7 +38,7 @@ tools/            self-hosted tools
 .docs/            docs and diagrams
 ```
 
-Every app in `apps/` is a `values.yaml` for the shared [charts/app](charts/app/) Helm chart (Deployment, Service, Ingress), plus `namespace.yaml` and, if needed, `sealed-secret.yaml`. Every tool in `tools/` is a plain directory of manifests. Argo CD entrypoint is [infra/argocd/applications/](infra/argocd/applications/).
+Every app in `apps/` is a `values.yaml` for the shared [charts/app](charts/app/) Helm chart (Deployment, Service, Ingress), plus `namespace.yaml` and, if needed, `sealed-secret.yaml`. Every tool in `tools/` is a plain directory of manifests. Argo CD entrypoint is [infra/argocd/applications/](infra/argocd/applications/), details in [.docs/argocd.md](.docs/argocd.md).
 
 ## Services
 
