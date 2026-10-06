@@ -1,27 +1,26 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: argocd
+  name: argocd-image-updater
   namespace: argocd
 spec:
   project: default
   sources:
     - repoURL: https://argoproj.github.io/argo-helm
-      chart: argo-cd
-      targetRevision: 10.9.0
+      chart: argocd-image-updater
+      targetRevision: 1.*
       helm:
-        releaseName: argocd
+        releaseName: argocd-image-updater
         valueFiles:
-          - $values/infra/argocd/values.yaml
+          - $values/infra/argocd-image-updater/values.yaml
     - repoURL: git@github.com:MescoCzubinski/homelab.git
       targetRevision: main
       ref: values
     - repoURL: git@github.com:MescoCzubinski/homelab.git
       targetRevision: main
-      path: infra/argocd
+      path: infra/argocd-image-updater
       directory:
-        recurse: true
-        include: "{ingress-*.yaml,sealed-secret.yaml,applications/*}"
+        include: "{image-updaters.yaml,sealed-secret.yaml}"
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
@@ -29,11 +28,3 @@ spec:
     automated:
       prune: true
       selfHeal: true
-    syncOptions:
-      - ServerSideApply=true
-      - RespectIgnoreDifferences=true
-  ignoreDifferences:
-    - group: argoproj.io
-      kind: Application
-      jqPathExpressions:
-        - .spec.sources[].helm.parameters

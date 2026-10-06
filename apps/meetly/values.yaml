@@ -5,7 +5,7 @@ components:
   - name: meetly-backend
     image:
       repository: ghcr.io/mescoczubinski/meetly-backend
-      tag: latest
+      tag: v0.0.1
     port: 8080
     env:
       - name: PORT
@@ -27,7 +27,7 @@ components:
   - name: meetly-frontend
     image:
       repository: ghcr.io/mescoczubinski/meetly-frontend
-      tag: latest
+      tag: v0.0.1
     port: 3000
     resources:
       requests:
