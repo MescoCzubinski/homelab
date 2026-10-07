@@ -38,7 +38,7 @@ tools/            self-hosted tools
 .docs/            docs and diagrams
 ```
 
-Every app in `apps/` is a `values.yaml` for the shared [charts/app](charts/app/) Helm chart (Deployment, Service, Ingress), plus `namespace.yaml` and, if needed, `sealed-secret.yaml`. Every tool in `tools/` is a plain directory of manifests. Argo CD entrypoint is [infra/argocd/applications/](infra/argocd/applications/), details in [.docs/argocd.md](.docs/argocd.md).
+Every app in `apps/` is a `values.yaml` for the shared [charts/app](charts/app/) Helm chart (Deployment, Service, Ingress), plus `sealed-secret.yaml` if needed. Every tool in `tools/` is a plain directory of manifests, plus `namespace.yaml`. Namespaces of apps and infra come from `CreateNamespace=true`, not from files. Argo CD entrypoint is [infra/argocd/applications/](infra/argocd/applications/), details in [.docs/argocd.md](.docs/argocd.md).
 
 ## Services
 

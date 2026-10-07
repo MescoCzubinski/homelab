@@ -20,7 +20,7 @@ spec:
       targetRevision: main
       path: apps/meetly
       directory:
-        include: "{namespace.yaml,sealed-secret.yaml}"
+        include: "sealed-secret.yaml"
   destination:
     server: https://kubernetes.default.svc
     namespace: meetly
@@ -28,3 +28,5 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
