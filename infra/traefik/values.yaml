@@ -67,28 +67,8 @@ env:
         name: cloudflare-dns-token
         key: CF_DNS_API_TOKEN
 
-persistence:
-  enabled: true
-  existingClaim: traefik-acme
-  path: /data
-
 updateStrategy:
   type: RollingUpdate
   rollingUpdate:
     maxUnavailable: 1
     maxSurge: 0
-
-deployment:
-  initContainers:
-    - name: acme-permissions
-      image: busybox:1.38.0
-      command:
-        - sh
-        - -c
-        - touch /data/acme.json && chown 65532:65532 /data/acme.json && chmod 600 /data/acme.json
-      securityContext:
-        runAsUser: 0
-        runAsNonRoot: false
-      volumeMounts:
-        - name: data
-          mountPath: /data

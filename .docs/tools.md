@@ -17,4 +17,4 @@ Dashed `svc` boxes are config only: Traefik reads pod IPs from them and connects
 - **Beszel:** the agent is a DaemonSet with `hostNetwork` and read-only `/proc` and `/sys`, the hub connects to it on `:45876`.
 - **Syncthing:** `config.xml` is copied from a ConfigMap on start.
 
-All data lives in `hostPath` under `/home/server/`, so that directory is what needs a backup. Traefik's certificates are there too (`/home/server/traefik/acme`).
+All data lives in `hostPath` under `/home/server/`, so that directory is what needs a backup.

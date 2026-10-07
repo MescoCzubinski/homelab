@@ -85,4 +85,4 @@ TCP needs a new entrypoint in [values.yaml](../infra/traefik/values.yaml) (`port
 ## TLS
 
 - **Public:** Cloudflare terminates TLS, and the tunnel to `cloudflared` is encrypted.
-- **VPN:** Traefik serves a Let's Encrypt wildcard cert for `czubinski.dev` and `*.czubinski.dev` on `websecure`. It is issued through the Cloudflare DNS challenge, so no open port is needed, and stored on the `traefik-acme` volume.
+- **VPN:** Traefik serves a Let's Encrypt wildcard cert for `czubinski.dev` and `*.czubinski.dev` on `websecure`. It is issued through the Cloudflare DNS challenge, so no open port is needed, and stored in an `emptyDir`, so it is re-issued when the pod restarts.

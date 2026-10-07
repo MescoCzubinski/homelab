@@ -25,7 +25,7 @@ infra/
   argocd/         Argo CD itself + applications/
   cloudflared/    Cloudflare Tunnel
   sealed-secrets/ Sealed Secrets controller
-  traefik/        Traefik values, middlewares, ACME volume
+  traefik/        Traefik values, middlewares
 apps/             my own apps
   homepage/
   meetly/
