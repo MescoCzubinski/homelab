@@ -41,19 +41,7 @@ ingress:
   host: meetly.czubinski.dev
   entrypoint: public
   paths:
-    - path: /sessions
-      service: meetly-backend
-      port: 8080
-    - path: /session
-      service: meetly-backend
-      port: 8080
-    - path: /health
-      service: meetly-backend
-      port: 8080
-    - path: /interests
-      service: meetly-backend
-      port: 8080
-    - path: /messages
+    - path: /api
       service: meetly-backend
       port: 8080
     - path: /
