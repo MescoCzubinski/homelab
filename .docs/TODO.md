@@ -1,5 +1,6 @@
 # Infra
 
+- [ ] Sync waves — Namespace → Secret → Chart, not everything at once
 - [ ] Postgres — shared database for apps that need one,
 - [ ] Mongodb — shared database for apps that need one,
 - [ ] Readiness probes — no traffic to pods that aren't up yet during rollouts

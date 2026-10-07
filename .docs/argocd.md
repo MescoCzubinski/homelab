@@ -15,7 +15,7 @@
 One parent Application, `argocd`, manages Argo itself and every file in `infra/argocd/applications/`. The parent deploys:
 
 - the Argo CD chart itself
-- `ingress-*.yaml` and `sealed-secret.yaml` from `infra/argocd`
+- the GUI ingress from the chart (`server.ingress`), `ingress-gh.yaml` and `sealed-secret.yaml` from `infra/argocd`
 - one child Application per file in `applications/`
 
 ## Multi-source
