@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: samba
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:MescoCzubinski/homelab.git
+    targetRevision: main
+    path: tools/samba
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: samba
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
