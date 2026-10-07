@@ -20,7 +20,7 @@ spec:
       targetRevision: main
       path: infra/traefik
       directory:
-        include: "{namespace.yaml,sealed-secret.yaml,middleware-*.yaml}"
+        include: "{sealed-secret.yaml,middleware-*.yaml}"
   destination:
     server: https://kubernetes.default.svc
     namespace: traefik
@@ -28,3 +28,5 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
