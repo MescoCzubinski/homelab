@@ -1,6 +1,6 @@
 # Tools
 
-Self-hosted tools from [tools/](../tools/), synced together by one [Argo CD](argocd.md) Application. All are VPN-only (see [network.md](network.md)).
+Self-hosted tools from [tools/](../tools/), each synced by its own [Argo CD](argocd.md) Application. All are VPN-only (see [network.md](network.md)).
 
 ![Tools](images/tools.png)
 
