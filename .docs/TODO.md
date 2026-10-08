@@ -19,7 +19,7 @@
 - [x] Generic app chart — reconsider vs per-app manifests
 - [ ] Helm charts for tools — use upstream charts where they exist
 - [x] Sync waves — Namespace → Secret → Chart, not everything at once
-- [ ] Readiness probes — no traffic to pods that aren't up yet during rollouts
+- [x] Readiness probes — no traffic to pods that aren't up yet during rollouts
 - [ ] Renovate — tracking pinned versions outside image updater
 - [ ] Dedicated VIP and DNS for API server instead of node IPs in k0s sans - k8s.czubinski.dev
 - [ ] Uptime Kuma — tells me when something is down
