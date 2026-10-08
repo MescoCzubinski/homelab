@@ -1,19 +1,23 @@
 {{- range .Values.components }}
+{{- $ctx := dict "root" $ "component" . }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .name }}
   namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "app.labels" $ctx | nindent 4 }}
 spec:
   replicas: 1
+  revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app: {{ .name }}
+      {{- include "app.selectorLabels" $ctx | nindent 6 }}
   template:
     metadata:
       labels:
-        app: {{ .name }}
+        {{- include "app.labels" $ctx | nindent 8 }}
     spec:
       {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:
@@ -21,16 +25,41 @@ spec:
         - name: {{ . }}
         {{- end }}
       {{- end }}
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: {{ .name }}
           image: {{ .image.repository }}:{{ .image.tag }}
-          imagePullPolicy: Always
-          {{- with .env }}
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            {{- toYaml (.securityContext | default $.Values.securityContext) | nindent 12 }}
+          {{- if or .env .secretEnv }}
           env:
+            {{- with .env }}
             {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- range $name, $secret := .secretEnv }}
+            - name: {{ $name }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secret }}
+                  key: {{ $name }}
+            {{- end }}
           {{- end }}
           ports:
-            - containerPort: {{ .port }}
+            - name: http
+              containerPort: {{ .port }}
+          readinessProbe:
+            {{- with .probe }}
+            httpGet:
+              path: {{ .path }}
+              port: http
+            {{- else }}
+            tcpSocket:
+              port: http
+            {{- end }}
+            periodSeconds: 5
           {{- with .resources }}
           resources:
             {{- toYaml . | nindent 12 }}

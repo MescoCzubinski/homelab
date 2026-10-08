@@ -1,0 +1,12 @@
+domain: czubinski.dev
+host: ""
+
+access: vpn
+
+imagePullSecrets:
+  - ghcr-pull
+
+securityContext:
+  allowPrivilegeEscalation: false
+
+components: []

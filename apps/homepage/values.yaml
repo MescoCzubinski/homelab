@@ -1,5 +1,5 @@
-imagePullSecrets:
-  - ghcr-pull
+host: czubinski.dev
+access: public
 
 components:
   - name: homepage
@@ -7,6 +7,8 @@ components:
       repository: ghcr.io/mescoczubinski/homepage
       tag: v0.0.1
     port: 80
+    paths:
+      - /
     resources:
       requests:
         cpu: 10m
@@ -14,11 +16,3 @@ components:
       limits:
         cpu: 200m
         memory: 64Mi
-
-ingress:
-  host: czubinski.dev
-  entrypoint: public
-  paths:
-    - path: /
-      service: homepage
-      port: 80

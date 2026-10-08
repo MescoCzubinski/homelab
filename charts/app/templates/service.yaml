@@ -1,14 +1,18 @@
 {{- range .Values.components }}
+{{- $ctx := dict "root" $ "component" . }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: {{ .name }}
   namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "app.labels" $ctx | nindent 4 }}
 spec:
   selector:
-    app: {{ .name }}
+    {{- include "app.selectorLabels" $ctx | nindent 4 }}
   ports:
-    - port: {{ .port }}
-      targetPort: {{ .port }}
+    - name: http
+      port: {{ .port }}
+      targetPort: http
 {{- end }}
