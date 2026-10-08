@@ -1,5 +1,4 @@
-imagePullSecrets:
-  - ghcr-pull
+access: public
 
 components:
   - name: meetly-backend
@@ -7,16 +6,17 @@ components:
       repository: ghcr.io/mescoczubinski/meetly-backend
       tag: v0.0.1
     port: 8080
+    paths:
+      - /api
+    probe:
+      path: /api/health
     env:
       - name: PORT
         value: "8080"
       - name: CORS_ORIGIN
         value: https://meetly.czubinski.dev
-      - name: JWT_SECRET
-        valueFrom:
-          secretKeyRef:
-            name: meetly-jwt
-            key: JWT_SECRET
+    secretEnv:
+      JWT_SECRET: meetly-jwt
     resources:
       requests:
         cpu: 100m
@@ -29,6 +29,8 @@ components:
       repository: ghcr.io/mescoczubinski/meetly-frontend
       tag: v0.0.1
     port: 3000
+    paths:
+      - /
     resources:
       requests:
         cpu: 10m
@@ -36,14 +38,3 @@ components:
       limits:
         cpu: 300m
         memory: 128Mi
-
-ingress:
-  host: meetly.czubinski.dev
-  entrypoint: public
-  paths:
-    - path: /api
-      service: meetly-backend
-      port: 8080
-    - path: /
-      service: meetly-frontend
-      port: 3000

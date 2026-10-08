@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["components"],
+  "properties": {
+    "global": { "type": "object" },
+    "domain": { "type": "string" },
+    "host": { "type": "string" },
+    "access": { "enum": ["public", "vpn", "github"] },
+    "imagePullSecrets": { "type": "array", "items": { "type": "string" } },
+    "securityContext": { "type": "object" },
+    "components": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "image", "port"],
+        "properties": {
+          "name": { "type": "string" },
+          "image": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["repository", "tag"],
+            "properties": {
+              "repository": { "type": "string" },
+              "tag": { "type": "string" }
+            }
+          },
+          "port": { "type": "integer" },
+          "paths": { "type": "array", "items": { "type": "string", "pattern": "^/" } },
+          "probe": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path"],
+            "properties": { "path": { "type": "string", "pattern": "^/" } }
+          },
+          "env": { "type": "array" },
+          "secretEnv": { "type": "object", "additionalProperties": { "type": "string" } },
+          "securityContext": { "type": "object" },
+          "resources": { "type": "object" }
+        }
+      }
+    }
+  }
+}

@@ -1,24 +1,41 @@
-{{- with .Values.ingress }}
+{{- $routed := list }}
+{{- range .Values.components }}
+{{- if .paths }}
+{{- $routed = append $routed . }}
+{{- end }}
+{{- end }}
+{{- if $routed }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ $.Release.Name }}
-  namespace: {{ $.Release.Namespace }}
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: {{ .entrypoint }}
+    {{- if eq .Values.access "public" }}
+    traefik.ingress.kubernetes.io/router.entrypoints: public
+    {{- else if eq .Values.access "github" }}
+    traefik.ingress.kubernetes.io/router.entrypoints: public
+    traefik.ingress.kubernetes.io/router.middlewares: default-http-gh-only@kubernetescrd
+    {{- else }}
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: default-http-vpn-only@kubernetescrd
+    {{- end }}
 spec:
   ingressClassName: traefik
   rules:
-    - host: {{ .host }}
+    - host: {{ .Values.host | default (printf "%s.%s" .Release.Name .Values.domain) }}
       http:
         paths:
+          {{- range $routed }}
+          {{- $component := . }}
           {{- range .paths }}
-          - path: {{ .path }}
+          - path: {{ . }}
             pathType: Prefix
             backend:
               service:
-                name: {{ .service }}
+                name: {{ $component.name }}
                 port:
-                  number: {{ .port }}
+                  name: http
+          {{- end }}
           {{- end }}
 {{- end }}
