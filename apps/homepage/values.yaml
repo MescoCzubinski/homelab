@@ -9,6 +9,8 @@ components:
     port: 80
     paths:
       - /
+    probe:
+      path: /
     resources:
       requests:
         cpu: 10m
