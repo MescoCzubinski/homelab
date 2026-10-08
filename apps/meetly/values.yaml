@@ -31,6 +31,8 @@ components:
     port: 3000
     paths:
       - /
+    probe:
+      path: /
     resources:
       requests:
         cpu: 10m
