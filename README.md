@@ -13,6 +13,7 @@ Single-node Kubernetes homelab on a Mac Mini, run with k0s and managed by Argo C
 | GitOps        | [Argo CD](https://argo-cd.readthedocs.io) ([argocd.md](.docs/argocd.md))                                            |
 | Ingress       | [Traefik](https://traefik.io), config in [infra/traefik/values.yaml](infra/traefik/values.yaml)                     |
 | Public access | [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) (`cloudflared`) |
+| Database      | [CloudNativePG](https://cloudnative-pg.io) ([postgres.md](.docs/postgres.md))                                       |
 | Secrets       | [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets)                                                    |
 
 ## File structure
@@ -24,6 +25,7 @@ charts/
 infra/
   argocd/         Argo CD itself + applications/
   cloudflared/    Cloudflare Tunnel
+  postgres/       Postgres cluster (CloudNativePG)
   sealed-secrets/ Sealed Secrets controller
   traefik/        Traefik values, middlewares
 apps/             my own apps

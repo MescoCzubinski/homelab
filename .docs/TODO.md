@@ -17,14 +17,16 @@
 - [x] Argo CD Image Updater
 - [x] One Application per tool
 - [x] Generic app chart — reconsider vs per-app manifests
-- [ ] Helm charts for tools — use upstream charts where they exist
 - [x] Sync waves — Namespace → Secret → Chart, not everything at once
 - [x] Readiness probes — no traffic to pods that aren't up yet during rollouts
-- [ ] Renovate — tracking pinned versions outside image updater
+- [x] Postgres — shared database for apps that need one (CloudNativePG, no backups yet)
+- [x] NetworkPolicy per namespace — default-deny ingress, allow only Traefik
+- [ ] Container hardening in tools/ — non-root, read-only root fs, drop capabilities, seccomp.
+- [ ] Unify security across charts/app, tools/ and infra/ — same securityContext and NetworkPolicy everywhere
 - [ ] Dedicated VIP and DNS for API server instead of node IPs in k0s sans - k8s.czubinski.dev
+- [ ] Renovate — tracking pinned versions outside image updater
+- [ ] Helm charts for tools — use upstream charts where they exist
 - [ ] Uptime Kuma — tells me when something is down
-- [ ] Postgres — shared database for apps that need one,
-- [ ] Mongodb — shared database for apps that need one,
 
 ## Apps
 
