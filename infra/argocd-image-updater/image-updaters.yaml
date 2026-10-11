@@ -49,3 +49,38 @@ spec:
             helm:
               name: "components[1].image.repository"
               tag: "components[1].image.tag"
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: atlas
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  commonUpdateSettings:
+    updateStrategy: semver
+    allowTags: "regexp:^v[0-9]+\\.[0-9]+\\.[0-9]+$"
+  writeBackConfig:
+    method: argocd
+  applicationRefs:
+    - namePattern: atlas
+      images:
+        - alias: backend
+          imageName: ghcr.io/mescoczubinski/besthacks2026-backend
+          manifestTargets:
+            helm:
+              name: "components[0].image.repository"
+              tag: "components[0].image.tag"
+        - alias: frontend
+          imageName: ghcr.io/mescoczubinski/besthacks2026-frontend
+          manifestTargets:
+            helm:
+              name: "components[1].image.repository"
+              tag: "components[1].image.tag"
+        - alias: fetcher
+          imageName: ghcr.io/mescoczubinski/besthacks2026-fetcher
+          manifestTargets:
+            helm:
+              name: "components[2].image.repository"
+              tag: "components[2].image.tag"

@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: atlas
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: git@github.com:MescoCzubinski/homelab.git
+      targetRevision: main
+      path: charts/app
+      helm:
+        releaseName: atlas
+        valueFiles:
+          - $values/apps/atlas/values.yaml
+    - repoURL: git@github.com:MescoCzubinski/homelab.git
+      targetRevision: main
+      ref: values
+    - repoURL: git@github.com:MescoCzubinski/homelab.git
+      targetRevision: main
+      path: apps/atlas
+      directory:
+        include: "sealed-secret.yaml"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: atlas
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    managedNamespaceMetadata:
+      labels:
+        postgres-access: "true"
