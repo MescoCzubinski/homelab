@@ -10,3 +10,10 @@ spec:
   storage:
     storageClass: local-postgres
     size: 10Gi
+  managed:
+    roles:
+      - name: atlas
+        ensure: present
+        login: true
+        passwordSecret:
+          name: atlas-db

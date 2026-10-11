@@ -1,0 +1,74 @@
+access: public
+
+components:
+  - name: atlas-backend
+    image:
+      repository: ghcr.io/mescoczubinski/besthacks2026-backend
+      tag: v0.0.1
+    port: 8000
+    paths:
+      - /api
+    probe:
+      path: /api/health
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 1536Mi
+    env:
+      - name: PORT
+        value: "8000"
+      - name: CORS_ORIGIN
+        value: https://atlas.czubinski.dev
+      - name: EMBEDDING_MODEL
+        value: Xenova/paraphrase-multilingual-MiniLM-L12-v2
+      - name: REGION_TIMEZONE
+        value: Europe/Warsaw
+    secretEnv:
+      JWT_SECRET: atlas-jwt
+      GRAPHHOPPER_URL: atlas-graphhopper
+      GRAPHHOPPER_TOKEN: atlas-graphhopper
+      EMBEDDING_API_TOKEN: atlas-embedding
+      DATABASE_URL: atlas-database-url
+  - name: atlas-frontend
+    image:
+      repository: ghcr.io/mescoczubinski/besthacks2026-frontend
+      tag: v0.0.1
+    port: 3000
+    paths:
+      - /
+    probe:
+      path: /
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 300m
+        memory: 128Mi
+  - name: atlas-fetcher
+    image:
+      repository: ghcr.io/mescoczubinski/besthacks2026-fetcher
+      tag: v0.0.1
+    port: 8000
+    probe:
+      path: /api/health
+    resources:
+      requests:
+        cpu: 50m
+        memory: 256Mi
+      limits:
+        cpu: "1"
+        memory: 1Gi
+    env:
+      - name: BACKEND_URL
+        value: http://atlas-backend:8000
+      - name: SOURCES
+        value: osm,wikidata,nid,commons,wroclaw_gis
+      - name: INTERVAL_SECONDS
+        value: "604800"
+    secretEnv:
+      DB_URL: atlas-database-url
+      EMBEDDING_API_TOKEN: atlas-embedding
