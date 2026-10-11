@@ -7,6 +7,16 @@ components:
       repository: ghcr.io/mescoczubinski/homepage
       tag: v0.0.1
     port: 80
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+        add:
+          - NET_BIND_SERVICE
+          - CHOWN
+          - SETUID
+          - SETGID
     paths:
       - /
     probe:

@@ -8,5 +8,8 @@ imagePullSecrets:
 
 securityContext:
   allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
 
 components: []
