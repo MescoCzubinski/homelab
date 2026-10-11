@@ -64,7 +64,7 @@ components:
         memory: 1Gi
     env:
       - name: BACKEND_URL
-        value: http://atlas-backend:8000
+        value: https://atlas.czubinski.dev/api
       - name: SOURCES
         value: osm,wikidata,nid,commons,wroclaw_gis
       - name: INTERVAL_SECONDS
