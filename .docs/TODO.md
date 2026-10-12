@@ -11,18 +11,18 @@
 - [x] Sealed Secrets — no more .env files
 - [x] Application per component — applications dir
 - [x] Argo CD webhook — sync on push
-- [x] Pin image versions everywhere
+- [x] Pin image versions everywhere (exception: `samba` uses `smbd-only-latest`)
 - [x] Resource limits per app
 - [x] Helm chart for apps
 - [x] Argo CD Image Updater
 - [x] One Application per tool
 - [x] Generic app chart — reconsider vs per-app manifests
-- [x] Sync waves — Namespace → Secret → Chart, not everything at once
+- [x] Sync waves — sealed secrets at wave -1 so they exist before the workloads, `postgres` at wave 1
 - [x] Readiness probes — no traffic to pods that aren't up yet during rollouts
 - [x] Postgres — shared database for apps that need one (CloudNativePG, no backups yet)
 - [x] NetworkPolicy per namespace — default-deny ingress, allow only Traefik
-- [x] Container hardening and unified security — non-root, read-only root fs, drop capabilities, seccomp in charts/app, tools/ and infra/
-- [ ] Renovate — tracking pinned versions outside image updater
+- [x] Container hardening and unified security — non-root, read-only root fs, drop capabilities, seccomp in charts/app, tools/ and infra/ (exceptions: `samba` adds capabilities and has a writable root fs, `stirling` and `beszel-hub` are not fully hardened)
+- [x] Renovate — tracking pinned versions outside image updater (`tools/`, `infra/cloudflared`, Argo CD Applications)
 - [ ] Dedicated VIP and DNS for API server instead of node IPs in k0s sans - k8s.czubinski.dev
 - [ ] Helm charts for tools — use upstream charts where they exist
 - [ ] Uptime Kuma — tells me when something is down
@@ -36,6 +36,7 @@
 - [x] Stirling PDF
 - [x] Homepage
 - [x] Meetly
+- [x] Atlas
 - [ ] RustDesk
 - [ ] Sonarr, Radarr, Lidarr
 - [ ] AFFiNE — needs Postgres
