@@ -33,3 +33,5 @@ spec:
     managedNamespaceMetadata:
       labels:
         postgres-access: "true"
+        pod-security.kubernetes.io/warn: restricted
+        pod-security.kubernetes.io/audit: restricted
