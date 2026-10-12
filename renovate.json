@@ -1,0 +1,31 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "timezone": "Europe/Warsaw",
+  "kubernetes": {
+    "managerFilePatterns": [
+      "/^tools/.+\\.ya?ml$/",
+      "/^infra/cloudflared/.+\\.ya?ml$/"
+    ]
+  },
+  "argocd": {
+    "managerFilePatterns": ["/^infra/argocd/applications/.+\\.ya?ml$/"]
+  },
+  "packageRules": [
+    {
+      "description": "Group the beszel hub and agent images",
+      "matchPackageNames": ["henrygd/beszel", "henrygd/beszel-agent"],
+      "groupName": "beszel"
+    },
+    {
+      "description": "Image tags in apps/ are owned by Argo CD Image Updater",
+      "matchFileNames": ["apps/**"],
+      "enabled": false
+    },
+    {
+      "description": "Skip patch bumps",
+      "matchUpdateTypes": ["patch"],
+      "enabled": false
+    }
+  ]
+}
