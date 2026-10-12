@@ -46,6 +46,22 @@ Server (firewalld):
 
 `443`, `445` and `22000` are Traefik entrypoints, `6443` is the Kubernetes API (kubectl over VPN).
 
+## NetworkPolicies
+
+Inside the cluster, ingress to app and tool namespaces is default-deny: a pod accepts traffic only from the `traefik` namespace. Egress is not restricted.
+
+| namespace                                                | policy                      | allows                                                     |
+| -------------------------------------------------------- | --------------------------- | ---------------------------------------------------------- |
+| `apps/*` (atlas, homepage, meetly), from `charts/app`    | `traefik-to-<app>`          | `traefik` namespace and pods from the same namespace       |
+| `tools/*` (beszel, convertx, samba, stirling, syncthing) | `traefik-to-<tool>`         | `traefik` namespace only                                   |
+| `postgres`                                               | `nobody-to-postgres`        | nothing (default-deny)                                     |
+| `postgres`                                               | `operator-to-postgres`      | `cnpg-system` to `pg` on `5432`, `8000`                    |
+| `postgres`                                               | `<app>-to-postgres`         | the `<app>` namespace on `5432` (now: atlas)               |
+| `argocd`                                                 | `argocd-*` (from the chart) | the chart's own per-component rules                        |
+| `cloudflared`                                            | `nobody-to-cloudflared`     | nothing (default-deny), it only makes outbound connections |
+
+Not covered: `traefik`, `sealed-secrets` and `cnpg-system` have no policy on purpose, so they accept all traffic. Traefik receives VPN traffic through `hostPort`. The `beszel-agent` runs with `hostNetwork`, so policies don't apply to it.
+
 ## Traefik
 
 Entrypoints decide where traffic comes in. Middlewares decide who is allowed through.
@@ -80,7 +96,7 @@ traefik.ingress.kubernetes.io/router.middlewares: default-http-gh-only@kubernete
 
 An ingress without the `entrypoints` annotation lands on `websecure` (`asDefault: true`) without any middleware.
 
-TCP needs a new entrypoint in [values.yaml](../infra/traefik/values.yaml) (`ports` with `hostPort` + `hostIP`, and a line in `additionalArguments`) and an `IngressRouteTCP`:
+TCP needs a new entrypoint in [values.yaml](../infra/traefik/values.yaml) (`ports` with `hostPort` + `hostIP`, and a line in `additionalArguments`) and an `IngressRouteTCP`, e.g. [tools/samba/ingress-tcp.yaml](../tools/samba/ingress-tcp.yaml)
 
 ## TLS
 
