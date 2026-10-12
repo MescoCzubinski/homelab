@@ -13,9 +13,14 @@ spec:
       labels:
         app: beszel-hub
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: beszel-hub
           image: henrygd/beszel:0.21.0
+          securityContext:
+            allowPrivilegeEscalation: false
           ports:
             - containerPort: 8090
           volumeMounts:
