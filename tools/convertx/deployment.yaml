@@ -21,6 +21,10 @@ spec:
           image: ghcr.io/c4illin/convertx:v0.19.0
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           env:
             - name: TZ
               value: Europe/Warsaw
@@ -31,8 +35,12 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /app/data
+            - name: tmp
+              mountPath: /tmp
       volumes:
         - name: data
           hostPath:
             path: /home/server/convertx/data
             type: DirectoryOrCreate
+        - name: tmp
+          emptyDir: {}
