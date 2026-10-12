@@ -2,7 +2,7 @@
 
 ## Overview
 
-[Argo CD](https://argo-cd.readthedocs.io/) runs in the cluster and keeps it in sync with this repo. Everything under `infra/` and `apps/` is applied by Argo.
+[Argo CD](https://argo-cd.readthedocs.io/) runs in the cluster and keeps it in sync with this repo. Everything under `infra/`, `apps/` and `tools/` is applied by Argo.
 
 - **Source of truth:** `git@github.com:MescoCzubinski/homelab.git`, branch `main`
 - **Sync policy:** automated, with `prune` and `selfHeal`, so manual changes in the cluster are reverted
@@ -20,13 +20,15 @@ One parent Application, `argocd`, manages Argo itself and every file in `infra/a
 
 ## Multi-source
 
-Most Applications use three sources, so the chart comes from upstream and the values stay in this repo:
+Applications that deploy a Helm chart (`argocd`, `traefik`, `sealed-secrets`, `argocd-image-updater` and everything in `apps/`) use up to three sources, so the chart comes from upstream (or `charts/app`) and the values stay in this repo:
 
-1. upstream Helm chart, values from `$values/...`
+1. Helm chart, values from `$values/...`
 2. this repo, only `ref: values`, so `$values` points at it
 3. this repo, `path` with extra manifests (ingress, sealed secrets)
 
 Source 3 is optional. It is how plain manifests are deployed together with a chart.
+
+Applications with plain manifests (everything in `tools/`, `cloudflared`, `postgres`) have a single source: a `path` in this repo. `cnpg` has a single source too, the upstream chart with default values.
 
 ## Webhook
 
@@ -49,6 +51,8 @@ Argo CD Image Updater watches GHCR and moves each app to the newest semver tag, 
 - **Write-back:** `method: argocd`, so the new tag is stored as `helm.parameters` on the Application, not in git
 - **Baseline:** `tag: v0.0.1` in each app's `values.yaml` is only the starting point, the live tag is in the cluster
 - **Registry:** `ghcr.io`, credentials from `argocd/ghcr-pull`
+- **Index coupling:** each image is mapped to `components[N].image.*`, so reordering `components` in an app's `values.yaml` silently breaks the updater until `image-updaters.yaml` is changed to match
+- **Renovate:** covers what the updater doesn't, i.e. `tools/`, `infra/cloudflared` and chart versions in `infra/argocd/applications/` (config in `renovate.json`, `apps/` and patch bumps are off)
 
 ### Self-heal vs. the updater
 

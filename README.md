@@ -15,6 +15,7 @@ Single-node Kubernetes homelab on a Mac Mini, run with k0s and managed by Argo C
 | Public access | [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) (`cloudflared`) |
 | Database      | [CloudNativePG](https://cloudnative-pg.io) ([postgres.md](.docs/postgres.md))                                       |
 | Secrets       | [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets)                                                    |
+| Updates       | [Renovate](https://docs.renovatebot.com) and Argo CD Image Updater ([argocd.md](.docs/argocd.md))                   |
 
 ## File structure
 
@@ -24,11 +25,13 @@ charts/
   app/            Helm chart for my own apps
 infra/
   argocd/         Argo CD itself + applications/
+  argocd-image-updater/ Image Updater + ImageUpdater CRs
   cloudflared/    Cloudflare Tunnel
-  postgres/       Postgres cluster (CloudNativePG)
+  postgres/       Postgres cluster (the CloudNativePG operator comes from the upstream chart)
   sealed-secrets/ Sealed Secrets controller
   traefik/        Traefik values, middlewares
 apps/             my own apps
+  atlas/
   homepage/
   meetly/
 tools/            self-hosted tools
@@ -47,6 +50,7 @@ Every app in `apps/` is a `values.yaml` for the shared [charts/app](charts/app/)
 | Service                         | Address                             | Access                          |
 | ------------------------------- | ----------------------------------- | ------------------------------- |
 | [homepage](apps/homepage/)      | `czubinski.dev`                     | public                          |
+| [atlas](apps/atlas/)            | `atlas.czubinski.dev`               | public                          |
 | [meetly](apps/meetly/)          | `meetly.czubinski.dev`              | public                          |
 | [Argo CD](infra/argocd/)        | `argocd.czubinski.dev`              | VPN, public for GitHub IPs only |
 | [Beszel](tools/beszel/)         | `beszel.czubinski.dev`              | VPN                             |
