@@ -13,9 +13,14 @@ spec:
       labels:
         app: samba
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: samba
           image: ghcr.io/servercontainers/samba:smbd-only-latest
+          securityContext:
+            allowPrivilegeEscalation: false
           env:
             - name: TZ
               value: Europe/Warsaw

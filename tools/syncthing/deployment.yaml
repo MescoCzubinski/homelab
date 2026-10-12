@@ -13,9 +13,14 @@ spec:
       labels:
         app: syncthing
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       initContainers:
         - name: syncthing-gui-auth
           image: syncthing/syncthing:2.1.0
+          securityContext:
+            allowPrivilegeEscalation: false
           command:
             - sh
             - -c
@@ -45,6 +50,8 @@ spec:
       containers:
         - name: syncthing
           image: syncthing/syncthing:2.1.0
+          securityContext:
+            allowPrivilegeEscalation: false
           ports:
             - containerPort: 8384
             - containerPort: 22000

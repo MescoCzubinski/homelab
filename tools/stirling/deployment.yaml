@@ -13,9 +13,14 @@ spec:
       labels:
         app: stirling
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: stirling
           image: stirlingtools/stirling-pdf:3.0.0
+          securityContext:
+            allowPrivilegeEscalation: false
           env:
             - name: SECURITY_ENABLELOGIN
               value: "false"
