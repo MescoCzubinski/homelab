@@ -21,10 +21,9 @@
 - [x] Readiness probes — no traffic to pods that aren't up yet during rollouts
 - [x] Postgres — shared database for apps that need one (CloudNativePG, no backups yet)
 - [x] NetworkPolicy per namespace — default-deny ingress, allow only Traefik
-- [ ] Container hardening in tools/ — non-root, read-only root fs, drop capabilities, seccomp.
-- [ ] Unify security across charts/app, tools/ and infra/ — same securityContext and NetworkPolicy everywhere
-- [ ] Dedicated VIP and DNS for API server instead of node IPs in k0s sans - k8s.czubinski.dev
+- [x] Container hardening and unified security — non-root, read-only root fs, drop capabilities, seccomp in charts/app, tools/ and infra/
 - [ ] Renovate — tracking pinned versions outside image updater
+- [ ] Dedicated VIP and DNS for API server instead of node IPs in k0s sans - k8s.czubinski.dev
 - [ ] Helm charts for tools — use upstream charts where they exist
 - [ ] Uptime Kuma — tells me when something is down
 

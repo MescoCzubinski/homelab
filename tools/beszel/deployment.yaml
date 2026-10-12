@@ -21,13 +21,21 @@ spec:
           image: henrygd/beszel:0.21.0
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           ports:
             - containerPort: 8090
           volumeMounts:
             - name: data
               mountPath: /beszel_data
+            - name: tmp
+              mountPath: /tmp
       volumes:
         - name: data
           hostPath:
             path: /home/server/beszel/hub-data
             type: DirectoryOrCreate
+        - name: tmp
+          emptyDir: {}
