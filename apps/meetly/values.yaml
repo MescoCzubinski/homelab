@@ -2,6 +2,7 @@ access: public
 
 components:
   - name: meetly-backend
+    runAsUser: 1000
     image:
       repository: ghcr.io/mescoczubinski/meetly-backend
       tag: v0.0.1
@@ -25,6 +26,7 @@ components:
         cpu: "1"
         memory: 1Gi
   - name: meetly-frontend
+    runAsUser: 1000
     image:
       repository: ghcr.io/mescoczubinski/meetly-frontend
       tag: v0.0.1

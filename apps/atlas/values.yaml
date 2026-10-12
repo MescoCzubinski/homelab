@@ -2,6 +2,7 @@ access: public
 
 components:
   - name: atlas-backend
+    runAsUser: 1000
     image:
       repository: ghcr.io/mescoczubinski/besthacks2026-backend
       tag: v0.0.1
@@ -33,6 +34,7 @@ components:
       EMBEDDING_API_TOKEN: atlas-embedding
       DATABASE_URL: atlas-database-url
   - name: atlas-frontend
+    runAsUser: 1000
     image:
       repository: ghcr.io/mescoczubinski/besthacks2026-frontend
       tag: v0.0.1
@@ -49,6 +51,7 @@ components:
         cpu: 300m
         memory: 128Mi
   - name: atlas-fetcher
+    runAsUser: 10001
     image:
       repository: ghcr.io/mescoczubinski/besthacks2026-fetcher
       tag: v0.0.1

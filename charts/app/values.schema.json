@@ -38,6 +38,7 @@
           },
           "env": { "type": "array" },
           "secretEnv": { "type": "object", "additionalProperties": { "type": "string" } },
+          "runAsUser": { "type": "integer" },
           "securityContext": { "type": "object" },
           "resources": { "type": "object" }
         }

@@ -34,6 +34,9 @@ spec:
           imagePullPolicy: IfNotPresent
           securityContext:
             {{- toYaml (.securityContext | default $.Values.securityContext) | nindent 12 }}
+            {{- with .runAsUser }}
+            runAsUser: {{ . }}
+            {{- end }}
           {{- if or .env .secretEnv }}
           env:
             {{- with .env }}
