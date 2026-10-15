@@ -16,10 +16,12 @@ Single-node Kubernetes homelab on a Mac Mini, run with k0s and managed by Argo C
 | Database      | [CloudNativePG](https://cloudnative-pg.io) ([postgres.md](.docs/postgres.md))                                       |
 | Secrets       | [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets)                                                    |
 | Updates       | [Renovate](https://docs.renovatebot.com) and Argo CD Image Updater ([argocd.md](.docs/argocd.md))                   |
+| CI            | [GitHub Actions](https://docs.github.com/actions)                                                                   |
 
 ## File structure
 
 ```
+.github/          CI workflow
 cluster/          k0s cluster config
 charts/
   app/            Helm chart for my own apps
@@ -43,7 +45,7 @@ tools/            self-hosted tools
 .docs/            docs and diagrams
 ```
 
-Every app in `apps/` is a `values.yaml` for the shared [charts/app](charts/app/) Helm chart (Deployment, Service, Ingress), plus `sealed-secret.yaml` if needed. Every tool in `tools/` is a plain directory of manifests with its own Application. Argo CD entrypoint is [infra/argocd/applications/](infra/argocd/applications/), details in [.docs/argocd.md](.docs/argocd.md).
+Every app in `apps/` is a `values.yaml` for the shared [charts/app](charts/app/) Helm chart (Deployment, Service, Ingress), plus `sealed-secret.yaml` if needed. Every tool in `tools/` has its own Application: a plain directory of manifests, or `values.yaml` for an upstream chart where a usable one exists (now: Stirling PDF). Argo CD entrypoint is [infra/argocd/applications/](infra/argocd/applications/), details in [.docs/argocd.md](.docs/argocd.md).
 
 ## Services
 

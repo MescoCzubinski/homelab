@@ -2,6 +2,9 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "timezone": "Europe/Warsaw",
+  "dependencyDashboardApproval": false,
+  "minimumReleaseAge": "3 days",
+  "schedule": ["before 6am on monday"],
   "kubernetes": {
     "managerFilePatterns": [
       "/^tools/.+\\.ya?ml$/",
@@ -27,5 +30,9 @@
       "matchUpdateTypes": ["patch"],
       "enabled": false
     }
-  ]
+  ],
+  "semanticCommits": "disabled",
+  "commitMessageAction": "",
+  "commitMessageTopic": "{{{replace \"^.*/\" \"\" depName}}}:",
+  "commitMessageExtra": "{{{replace \"^v?\" \"v\" newVersion}}}"
 }
