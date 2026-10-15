@@ -1,0 +1,36 @@
+fullnameOverride: stirling
+
+image:
+  registry: docker.io
+  repository: stirlingtools/stirling-pdf
+  tag: 3.0.0
+
+envs:
+  - name: SECURITY_ENABLELOGIN
+    value: "false"
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  seccompProfile:
+    type: RuntimeDefault
+
+deployment:
+  extraVolumes:
+    - name: config
+      hostPath:
+        path: /home/server/stirling/config
+        type: DirectoryOrCreate
+  extraVolumeMounts:
+    - name: config
+      mountPath: /configs
+
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  pathType: Prefix
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: default-http-vpn-only@kubernetescrd
+  hosts:
+    - name: stirling.czubinski.dev
+      path: /
