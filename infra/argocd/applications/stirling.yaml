@@ -5,10 +5,22 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  source:
-    repoURL: git@github.com:MescoCzubinski/homelab.git
-    targetRevision: main
-    path: tools/stirling
+  sources:
+    - repoURL: https://docs.stirlingpdf.com/Stirling-PDF-chart/
+      chart: stirling-pdf-chart
+      targetRevision: 3.1.0
+      helm:
+        releaseName: stirling
+        valueFiles:
+          - $values/tools/stirling/values.yaml
+    - repoURL: git@github.com:MescoCzubinski/homelab.git
+      targetRevision: main
+      ref: values
+    - repoURL: git@github.com:MescoCzubinski/homelab.git
+      targetRevision: main
+      path: tools/stirling
+      directory:
+        include: "networkpolicy.yaml"
   destination:
     server: https://kubernetes.default.svc
     namespace: stirling
