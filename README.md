@@ -9,7 +9,7 @@ Single-node Kubernetes homelab on a Mac Mini, run with k0s and managed by Argo C
 | Layer         | Tool                                                                                                                |
 | ------------- | ------------------------------------------------------------------------------------------------------------------- |
 | Hardware      | Mac Mini 2012, i7-3720QM, 16 GB RAM, 250 GB SSD ([hardware.md](.docs/hardware.md))                                  |
-| Kubernetes    | [k0s](https://k0sproject.io), config in [cluster/k0s.yaml](cluster/k0s.yaml)                                        |
+| Kubernetes    | [k0s](https://k0sproject.io), config in [cluster/k0sctl.yaml](cluster/k0sctl.yaml)                                  |
 | GitOps        | [Argo CD](https://argo-cd.readthedocs.io) ([argocd.md](.docs/argocd.md))                                            |
 | Ingress       | [Traefik](https://traefik.io), config in [infra/traefik/values.yaml](infra/traefik/values.yaml)                     |
 | Public access | [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) (`cloudflared`) |
