@@ -1,0 +1,34 @@
+language: "en-US"
+tone_instructions: "Be concise and direct. No pleasantries, only concrete, actionable comments."
+
+reviews:
+  profile: "chill"
+  sequence_diagrams: false
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    drafts: false
+    ignore_usernames:
+      - "renovate[bot]"
+  finishing_touches:
+    docstrings:
+      enabled: false
+    unit_tests:
+      enabled: false
+  path_filters:
+    - "!**/sealed-secret.yaml"
+    - "!**/*-sealed-secret.yaml"
+    - "!**/*.pem"
+    - "!.docs/images/**"
+  path_instructions:
+    - path: "{tools,infra,apps,charts}/**"
+      instructions: "Review overall cluster security: attack surface, exposure, least privilege, network isolation, blast radius. All apps should have the same security settings; deviations need a reason."
+    - path: ".docs/**"
+      instructions: "README, .docs and TODO must match the code changes in the PR."
+  tools:
+    yamllint:
+      enabled: true
+    checkov:
+      enabled: true
+    osvScanner:
+      enabled: false
