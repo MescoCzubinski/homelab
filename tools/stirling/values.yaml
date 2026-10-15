@@ -3,7 +3,7 @@ fullnameOverride: stirling
 image:
   registry: docker.io
   repository: stirlingtools/stirling-pdf
-  tag: 3.0.0
+  tag: 3.1.0
 
 envs:
   - name: SECURITY_ENABLELOGIN
