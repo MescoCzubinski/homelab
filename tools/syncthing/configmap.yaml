@@ -17,7 +17,7 @@ data:
         <folder id="ReactionMemes" label="ReactionMemes" path="/var/syncthing/data/ReactionMemes" type="sendreceive">
             <device id="J22COXJ-OIFALUG-ZQEJIHV-RALME62-QRPFDTW-GW35ZBK-W23T3L4-LUJSJAG"/>
         </folder>
-        <folder id="Phone" label="Phone" path="/var/syncthing/data/Phone" type="sendreceive">
+        <folder id="Phone" label="Phone" path="/var/syncthing/data/Pictures/Phone" type="sendreceive">
             <device id="J22COXJ-OIFALUG-ZQEJIHV-RALME62-QRPFDTW-GW35ZBK-W23T3L4-LUJSJAG"/>
         </folder>
 
