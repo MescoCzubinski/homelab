@@ -39,13 +39,14 @@ apps/             my own apps
 tools/            self-hosted tools
   beszel/
   convertx/
+  gatus/
   samba/
   stirling/
   syncthing/
 .docs/            docs and diagrams
 ```
 
-Every app in `apps/` is a `values.yaml` for the shared [charts/app](charts/app/) Helm chart (Deployment, Service, Ingress), plus `sealed-secret.yaml` if needed. Every tool in `tools/` has its own Application: a plain directory of manifests, or `values.yaml` for an upstream chart where a usable one exists (now: Stirling PDF). Argo CD entrypoint is [infra/argocd/applications/](infra/argocd/applications/), details in [.docs/argocd.md](.docs/argocd.md).
+Every app in `apps/` is a `values.yaml` for the shared [charts/app](charts/app/) Helm chart (Deployment, Service, Ingress), plus `sealed-secret.yaml` if needed. Every tool in `tools/` has its own Application: a plain directory of manifests, or `values.yaml` for an upstream chart where a usable one exists (now: Stirling PDF, Gatus). Argo CD entrypoint is [infra/argocd/applications/](infra/argocd/applications/), details in [.docs/argocd.md](.docs/argocd.md).
 
 ## Services
 
@@ -57,6 +58,7 @@ Every app in `apps/` is a `values.yaml` for the shared [charts/app](charts/app/)
 | [Argo CD](infra/argocd/)        | `argocd.czubinski.dev`              | VPN, public for GitHub IPs only |
 | [Beszel](tools/beszel/)         | `beszel.czubinski.dev`              | VPN                             |
 | [ConvertX](tools/convertx/)     | `convert.czubinski.dev`             | VPN                             |
+| [Gatus](tools/gatus/)           | `gatus.czubinski.dev`               | VPN                             |
 | [Stirling PDF](tools/stirling/) | `stirling.czubinski.dev`            | VPN                             |
 | [Syncthing](tools/syncthing/)   | `syncthing.czubinski.dev`, `:22000` | VPN                             |
 | [Samba](tools/samba/)           | `:445`                              | VPN                             |
