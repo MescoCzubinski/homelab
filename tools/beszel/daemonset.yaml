@@ -4,6 +4,7 @@ metadata:
   name: beszel-agent
   namespace: beszel
 spec:
+  revisionHistoryLimit: 3
   selector:
     matchLabels:
       app: beszel-agent
