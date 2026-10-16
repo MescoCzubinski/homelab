@@ -19,7 +19,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: samba
-          image: ghcr.io/servercontainers/samba:smbd-only-latest
+          image: ghcr.io/servercontainers/samba:smbd-only-a3.24.2-s4.23.8-r0
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
