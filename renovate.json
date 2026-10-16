@@ -29,6 +29,13 @@
       "description": "Skip patch bumps",
       "matchUpdateTypes": ["patch"],
       "enabled": false
+    },
+    {
+      "description": "Samba tags look like smbd-only-a<alpine>-s<samba>-r<rev>; track the samba version",
+      "matchPackageNames": ["ghcr.io/servercontainers/samba"],
+      "versioning": "regex:^smbd-only-a\\d+\\.\\d+\\.\\d+-s(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-r(?<build>\\d+)$",
+      "matchUpdateTypes": ["major", "minor"],
+      "enabled": true
     }
   ],
   "semanticCommits": "disabled",
