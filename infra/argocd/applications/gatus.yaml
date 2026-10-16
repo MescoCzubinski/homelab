@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gatus
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://twin.github.io/helm-charts
+      chart: gatus
+      targetRevision: 1.5.0
+      helm:
+        releaseName: gatus
+        valueFiles:
+          - $values/tools/gatus/values.yaml
+    - repoURL: git@github.com:MescoCzubinski/homelab.git
+      targetRevision: main
+      ref: values
+    - repoURL: git@github.com:MescoCzubinski/homelab.git
+      targetRevision: main
+      path: tools/gatus
+      directory:
+        include: "networkpolicy.yaml"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gatus
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    managedNamespaceMetadata:
+      labels:
+        pod-security.kubernetes.io/warn: restricted
+        pod-security.kubernetes.io/audit: restricted

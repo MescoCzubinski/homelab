@@ -1,0 +1,86 @@
+image:
+  tag: v5.37.0
+
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: default-http-vpn-only@kubernetescrd
+  hosts:
+    - gatus.czubinski.dev
+
+config:
+  endpoints:
+    - name: Homepage
+      group: apps
+      url: "https://czubinski.dev/"
+      interval: 5m
+      conditions:
+        - "[STATUS] == 200"
+    - name: Meetly frontend
+      group: apps
+      url: "https://meetly.czubinski.dev/"
+      interval: 5m
+      conditions:
+        - "[STATUS] == 200"
+    - name: Meetly backend
+      group: apps
+      url: "https://meetly.czubinski.dev/api/health"
+      interval: 5m
+      conditions:
+        - "[STATUS] == 200"
+    - name: Atlas frontend
+      group: apps
+      url: "https://atlas.czubinski.dev/"
+      interval: 5m
+      conditions:
+        - "[STATUS] == 200"
+    - name: Atlas backend
+      group: apps
+      url: "https://atlas.czubinski.dev/api/health"
+      interval: 5m
+      conditions:
+        - "[STATUS] == 200"
+    - name: ArgoCD
+      group: tools
+      url: "http://argocd-server.argocd.svc.cluster.local/healthz"
+      interval: 5m
+      conditions:
+        - "[STATUS] == 200"
+    - name: Beszel
+      group: tools
+      url: "http://beszel-hub.beszel.svc.cluster.local:8090/"
+      interval: 5m
+      conditions:
+        - "[STATUS] == 200"
+    - name: ConvertX
+      group: tools
+      url: "http://convertx.convertx.svc.cluster.local:3000/"
+      interval: 5m
+      conditions:
+        - "[STATUS] == 200"
+    - name: Stirling PDF
+      group: tools
+      url: "http://stirling.stirling.svc.cluster.local:8080/"
+      interval: 5m
+      conditions:
+        - "[STATUS] == 200"
+    - name: Syncthing
+      group: tools
+      url: "tcp://syncthing.syncthing.svc.cluster.local:8384"
+      interval: 5m
+      conditions:
+        - "[CONNECTED] == true"
+    - name: Samba
+      group: tools
+      url: "tcp://samba.samba.svc.cluster.local:445"
+      interval: 5m
+      conditions:
+        - "[CONNECTED] == true"
+    - name: Syncthing sync
+      group: tools
+      url: "tcp://syncthing.syncthing.svc.cluster.local:22000"
+      interval: 5m
+      conditions:
+        - "[CONNECTED] == true"

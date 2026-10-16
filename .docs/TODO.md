@@ -24,8 +24,8 @@
 - [x] Container hardening and unified security — non-root, read-only root fs, drop capabilities, seccomp in charts/app, tools/ and infra/ (exceptions: `samba` adds capabilities and has a writable root fs, `stirling` and `beszel-hub` are not fully hardened)
 - [x] Renovate — tracking pinned versions outside image updater (`tools/`, `infra/cloudflared`, Argo CD Applications)
 - [x] Dedicated VIP and DNS for API server (`k8s.czubinski.dev`) instead of node IPs in k0s sans
-- [ ] Helm charts for tools — use upstream charts where they exist
-- [ ] Uptime Kuma — tells me when something is down
+- [x] Helm charts for tools — use upstream charts where they exist
+- [x] Gatus — status page and uptime checks for all apps and tools
 - [ ] Monitoring — metrics and dashboards (Prometheus + Grafana, or alternative)
 
 ## Apps

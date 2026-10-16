@@ -53,7 +53,8 @@ Inside the cluster, ingress to app and tool namespaces is default-deny: a pod ac
 | namespace                                                | policy                      | allows                                                     |
 | -------------------------------------------------------- | --------------------------- | ---------------------------------------------------------- |
 | `apps/*` (atlas, homepage, meetly), from `charts/app`    | `traefik-to-<app>`          | `traefik` namespace and pods from the same namespace       |
-| `tools/*` (beszel, convertx, samba, stirling, syncthing) | `traefik-to-<tool>`         | `traefik` namespace only                                   |
+| `tools/*` (beszel, convertx, gatus, samba, stirling, syncthing) | `traefik-to-<tool>`         | `traefik` namespace only                                   |
+| `tools/*` (beszel, convertx, samba, stirling, syncthing) | `gatus-to-<tool>`           | `gatus` namespace, so Gatus can probe the services         |
 | `postgres`                                               | `nobody-to-postgres`        | nothing (default-deny)                                     |
 | `postgres`                                               | `operator-to-postgres`      | `cnpg-system` to `pg` on `5432`, `8000`                    |
 | `postgres`                                               | `<app>-to-postgres`         | the `<app>` namespace on `5432` (now: atlas)               |
