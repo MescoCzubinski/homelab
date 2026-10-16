@@ -5,6 +5,8 @@ metadata:
 spec:
   hosts:
     - role: single
+      installFlags:
+        - --profile=single
       ssh:
         address: 192.168.0.1
         user: server
@@ -84,3 +86,31 @@ spec:
           type: etcd
         telemetry:
           enabled: false
+        workerProfiles:
+          - name: single
+            values:
+              imageMaximumGCAge: 96h
+              imageGCHighThresholdPercent: 70
+              imageGCLowThresholdPercent: 60
+
+              containerLogMaxSize: 5Mi
+              containerLogMaxFiles: 2
+
+              shutdownGracePeriod: 60s
+              shutdownGracePeriodCriticalPods: 20s
+
+              serializeImagePulls: false
+              maxParallelImagePulls: 3
+
+              systemReserved:
+                cpu: 500m
+                memory: 1Gi
+              kubeReserved:
+                cpu: 500m
+                memory: 1Gi
+
+              evictionHard:
+                memory.available: 500Mi
+                nodefs.available: 10%
+                nodefs.inodesFree: 5%
+                imagefs.available: 10%
