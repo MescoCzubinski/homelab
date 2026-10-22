@@ -32,11 +32,11 @@ Applications with plain manifests (everything in `tools/`, `cloudflared`, `postg
 
 ## Webhook
 
-A push to this repo triggers a GitHub webhook to `argocd.czubinski.dev/api/webhook`, so Argo refreshes right away instead of waiting for its ~3 min poll.
+A push to this repo triggers a GitHub webhook to `argo.czubinski.dev/api/webhook`, so Argo refreshes right away instead of waiting for its ~3 min poll.
 
 ![Webhook](images/argocd-webhook.png)
 
-- **Ingress:** `ingress-gh.yaml` exposes only `/api/webhook` on the `public` entrypoint
+- **Ingress:** `ingress-gh.yaml` exposes only `/api/webhook` on `argo.czubinski.dev` through the `public` entrypoint, the GUI on `argocd.czubinski.dev` is VPN-only
 - **Middleware:** `http-gh-only` lets through only GitHub's webhook IP ranges, read from `X-Forwarded-For` because requests arrive through `cloudflared`
 - **Signature:** `configs.secret.githubSecret` reads `argocd-webhook:github`, so Argo rejects payloads not signed with that secret
 

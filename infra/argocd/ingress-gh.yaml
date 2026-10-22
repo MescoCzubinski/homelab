@@ -9,7 +9,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: argocd.czubinski.dev
+    - host: argo.czubinski.dev
       http:
         paths:
           - path: /api/webhook
