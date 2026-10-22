@@ -55,7 +55,7 @@ Every app in `apps/` is a `values.yaml` for the shared [charts/app](charts/app/)
 | [homepage](apps/homepage/)      | `czubinski.dev`                     | public                          |
 | [atlas](apps/atlas/)            | `atlas.czubinski.dev`               | public                          |
 | [meetly](apps/meetly/)          | `meetly.czubinski.dev`              | public                          |
-| [Argo CD](infra/argocd/)        | `argocd.czubinski.dev`              | VPN, public for GitHub IPs only |
+| [Argo CD](infra/argocd/)        | `argocd.czubinski.dev`, `argo.czubinski.dev` | VPN, webhook public for GitHub IPs only |
 | [Beszel](tools/beszel/)         | `beszel.czubinski.dev`              | VPN                             |
 | [ConvertX](tools/convertx/)     | `convert.czubinski.dev`             | VPN                             |
 | [Gatus](tools/gatus/)           | `gatus.czubinski.dev`               | VPN                             |
