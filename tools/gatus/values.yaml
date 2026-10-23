@@ -10,7 +10,18 @@ ingress:
   hosts:
     - gatus.czubinski.dev
 
+deployment:
+  strategy: Recreate
+
+extraVolumeMounts:
+  - name: data
+    mountPath: /data
+    hostPath: /home/server/gatus/data
+
 config:
+  storage:
+    type: sqlite
+    path: /data/data.db
   endpoints:
     - name: Homepage
       group: apps
@@ -42,6 +53,18 @@ config:
       interval: 5m
       conditions:
         - "[STATUS] == 200"
+    - name: Traefik
+      group: infra
+      url: "tcp://traefik.traefik.svc.cluster.local:443"
+      interval: 5m
+      conditions:
+        - "[CONNECTED] == true"
+    - name: Postgres
+      group: infra
+      url: "tcp://pg-rw.postgres.svc.cluster.local:5432"
+      interval: 5m
+      conditions:
+        - "[CONNECTED] == true"
     - name: ArgoCD
       group: tools
       url: "http://argocd-server.argocd.svc.cluster.local/healthz"
