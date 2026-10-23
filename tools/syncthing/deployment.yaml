@@ -5,6 +5,8 @@ metadata:
   namespace: syncthing
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 3
   selector:
     matchLabels:
