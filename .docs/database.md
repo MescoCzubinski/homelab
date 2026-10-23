@@ -1,4 +1,4 @@
-# Postgres
+# Database
 
 ## Overview
 
@@ -7,7 +7,7 @@ One shared PostgreSQL 17 instance for apps that need a database, run by [CloudNa
 - **Operator:** `cnpg` Application, upstream chart in namespace `cnpg-system`
 - **Cluster:** `pg` in namespace `postgres` ([infra/postgres/cluster.yaml](../infra/postgres/cluster.yaml)), one instance, no replicas
 - **Superuser:** disabled (`enableSuperuserAccess: false`), each app gets its own role and database
-- **Sync wave:** the `postgres` Application is at wave `1`
+- **Sync wave:** the `postgres` Application is at wave `1`, so it syncs after the `cnpg` operator (default wave) and its CRDs
 
 ## Storage
 
@@ -16,8 +16,6 @@ A static `local` PersistentVolume ([persistentvolume.yaml](../infra/postgres/per
 - **Path:** `/home/server/postgres/data`
 - **Node affinity:** `kubernetes.io/hostname: myserver.home`, so the PV is tied to this node. It has to be changed if the node is renamed or replaced.
 - **StorageClass:** `local-postgres`, no provisioner, `WaitForFirstConsumer`
-
-There are **no backups yet**. Together with the tools' data, `/home/server/` is what needs a backup, but a file copy of a running Postgres is not consistent. A proper solution is CNPG backups (Barman) or `pg_dump`.
 
 ## Access
 

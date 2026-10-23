@@ -8,6 +8,8 @@ image:
 envs:
   - name: SECURITY_ENABLELOGIN
     value: "false"
+  - name: JAVA_CUSTOM_OPTS
+    value: "-Xmx2g -XX:InitialRAMPercentage=0.5 -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=30"
 
 containerSecurityContext:
   allowPrivilegeEscalation: false
