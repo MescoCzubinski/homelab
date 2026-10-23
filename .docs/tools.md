@@ -10,7 +10,7 @@ Dashed `svc` boxes are config only: Traefik reads pod IPs from them and connects
 | ------------ | -------------------------- | ----------------------------------- | -------------------------------------- |
 | Beszel       | server monitoring          | `beszel.czubinski.dev`              | `/home/server/beszel/hub-data`         |
 | ConvertX     | file conversion            | `convert.czubinski.dev`             | `/home/server/convertx/data`           |
-| Gatus        | uptime checks, status page | `gatus.czubinski.dev`               | none, history is in memory             |
+| Gatus        | uptime checks, status page | `gatus.czubinski.dev`               | `/home/server/gatus/data` (SQLite)     |
 | Stirling PDF | PDF tools                  | `stirling.czubinski.dev`            | `/home/server/stirling/config`         |
 | Syncthing    | file sync                  | `syncthing.czubinski.dev`, `:22000` | `/home/server/syncthing/{config,data}` |
 | Samba        | network share `Shared`     | `\\192.168.0.1\Shared` (`:445`)     | `/home/server/samba/Shared`            |

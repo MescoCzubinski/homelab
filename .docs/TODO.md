@@ -1,32 +1,39 @@
 # Infra
 
-- [x] Traefik — ingress for everything
-- [x] VPN-only middleware — HTTP and TCP
-- [x] TLS — ACME wildcard for \*.czubinski.dev
+- [x] Traefik — single ingress for all apps and tools
+- [x] VPN-only middleware — restricts HTTP and TCP routes
+- [x] TLS — ACME wildcard certificate for \*.czubinski.dev
 - [x] Cloudflared — public entrypoint without open ports
-- [x] GitHub-only middleware
-- [x] Argo CD
+- [x] GitHub-only middleware — webhooks from GitHub IPs only
+- [x] Argo CD — GitOps controller for the whole cluster
 - [x] Declarative infra — Argo CD manages itself and infra
-- [x] Namespace per app
-- [x] Sealed Secrets — no more .env files
-- [x] Application per component — applications dir
-- [x] Argo CD webhook — sync on push
-- [x] Pin image versions everywhere (exception: `samba` uses `smbd-only-latest`)
-- [x] Resource limits per app
-- [x] Helm chart for apps
-- [x] Argo CD Image Updater
-- [x] One Application per tool
-- [x] Generic app chart — reconsider vs per-app manifests
-- [x] Sync waves — sealed secrets at wave -1 so they exist before the workloads, `postgres` at wave 1
-- [x] Readiness probes — no traffic to pods that aren't up yet during rollouts
-- [x] Postgres — shared database for apps that need one (CloudNativePG, no backups yet)
-- [x] NetworkPolicy per namespace — default-deny ingress, allow only Traefik
-- [x] Container hardening and unified security — non-root, read-only root fs, drop capabilities, seccomp in charts/app, tools/ and infra/ (exceptions: `samba` adds capabilities and has a writable root fs, `stirling` and `beszel-hub` are not fully hardened)
-- [x] Renovate — tracking pinned versions outside image updater (`tools/`, `infra/cloudflared`, Argo CD Applications)
-- [x] Dedicated VIP and DNS for API server (`k8s.czubinski.dev`) instead of node IPs in k0s sans
-- [x] Helm charts for tools — use upstream charts where they exist
-- [x] Gatus — status page and uptime checks for all apps and tools
-- [ ] Monitoring — metrics and dashboards (Prometheus + Grafana, or alternative)
+- [x] Namespace per app — isolation, managed by Argo CD
+- [x] Sealed Secrets — encrypted secrets instead of .env files
+- [x] Application per component — kept in applications dir
+- [x] Argo CD webhook — sync on push instead of polling
+- [x] Pin image versions everywhere — no more latest tags
+- [x] Resource limits per app — requests and limits set
+- [x] Helm chart for apps — shared template for deployments
+- [x] Argo CD Image Updater — bumps image tags automatically
+- [x] One Application per tool — tools synced independently
+- [x] Generic app chart — reconsidered vs per-app manifests
+- [x] Sync waves — secrets at -1, `postgres` at 1, apps after
+- [x] Readiness probes — no traffic to pods that aren't up
+- [x] Postgres — shared CloudNativePG database, no backups
+- [x] NetworkPolicy — default-deny ingress, allow Traefik
+- [x] Container hardening — non-root, read-only fs, seccomp
+- [x] Pod Security labels — enforced per namespace
+- [x] Renovate — tracks pinned versions beyond Image Updater
+- [x] CI — Renovate and CodeRabbit configuration files
+- [x] Dedicated VIP and DNS for API (`k8s.czubinski.dev`)
+- [x] kube-vip — control plane VIP with k0sctl config
+- [x] Helm charts for tools — upstream where they exist
+- [x] Gatus — status page and uptime checks for everything
+- [ ] Cloudflare config in repo — DNS and tunnels (OpenTofu)
+- [ ] Error pages — styled 502, 503 and 504 via Traefik
+- [ ] Cloudflare custom pages — HTML for 5XX and tunnel errors
+- [ ] Monitoring — metrics and dashboards (Prometheus/Grafana)
+- [ ] Auto backup — scheduled backups of data and Postgres
 
 ## Apps
 
@@ -40,4 +47,4 @@
 - [x] Atlas
 - [ ] RustDesk
 - [ ] Sonarr, Radarr, Lidarr
-- [ ] AFFiNE — needs Postgres
+- [ ] AFFiNE

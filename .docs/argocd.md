@@ -20,7 +20,7 @@ One parent Application, `argocd`, manages Argo itself and every file in `infra/a
 
 ## Multi-source
 
-Applications that deploy a Helm chart (`argocd`, `traefik`, `sealed-secrets`, `argocd-image-updater` and everything in `apps/`) use up to three sources, so the chart comes from upstream (or `charts/app`) and the values stay in this repo:
+Applications that deploy a Helm chart (`argocd`, `traefik`, `sealed-secrets`, `argocd-image-updater`, `kube-vip`, `gatus`, `stirling` and everything in `apps/`) use up to three sources, so the chart comes from upstream (or `charts/app`) and the values stay in this repo:
 
 1. Helm chart, values from `$values/...`
 2. this repo, only `ref: values`, so `$values` points at it
@@ -28,7 +28,7 @@ Applications that deploy a Helm chart (`argocd`, `traefik`, `sealed-secrets`, `a
 
 Source 3 is optional. It is how plain manifests are deployed together with a chart.
 
-Applications with plain manifests (everything in `tools/`, `cloudflared`, `postgres`) have a single source: a `path` in this repo. `cnpg` has a single source too, the upstream chart with default values.
+Applications with plain manifests (`beszel`, `convertx`, `samba`, `syncthing`, `cloudflared`, `postgres`) have a single source: a `path` in this repo. `cnpg` has a single source too, the upstream chart with default values.
 
 ## Webhook
 

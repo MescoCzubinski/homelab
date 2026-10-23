@@ -13,7 +13,7 @@ Single-node Kubernetes homelab on a Mac Mini, run with k0s and managed by Argo C
 | GitOps        | [Argo CD](https://argo-cd.readthedocs.io) ([argocd.md](.docs/argocd.md))                                            |
 | Ingress       | [Traefik](https://traefik.io), config in [infra/traefik/values.yaml](infra/traefik/values.yaml)                     |
 | Public access | [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) (`cloudflared`) |
-| Database      | [CloudNativePG](https://cloudnative-pg.io) ([postgres.md](.docs/postgres.md))                                       |
+| Database      | [CloudNativePG](https://cloudnative-pg.io) ([database.md](.docs/database.md))                                       |
 | Secrets       | [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets)                                                    |
 | Updates       | [Renovate](https://docs.renovatebot.com) and Argo CD Image Updater ([argocd.md](.docs/argocd.md))                   |
 | CI            | [GitHub Actions](https://docs.github.com/actions)                                                                   |
@@ -29,6 +29,7 @@ infra/
   argocd/         Argo CD itself + applications/
   argocd-image-updater/ Image Updater + ImageUpdater CRs
   cloudflared/    Cloudflare Tunnel
+  kube-vip/       Virtual IP for the API server
   postgres/       Postgres cluster (the CloudNativePG operator comes from the upstream chart)
   sealed-secrets/ Sealed Secrets controller
   traefik/        Traefik values, middlewares
@@ -50,28 +51,27 @@ Every app in `apps/` is a `values.yaml` for the shared [charts/app](charts/app/)
 
 ## Services
 
-| Service                         | Address                             | Access                          |
-| ------------------------------- | ----------------------------------- | ------------------------------- |
-| [homepage](apps/homepage/)      | `czubinski.dev`                     | public                          |
-| [atlas](apps/atlas/)            | `atlas.czubinski.dev`               | public                          |
-| [meetly](apps/meetly/)          | `meetly.czubinski.dev`              | public                          |
+| Service                         | Address                                      | Access                                  |
+| ------------------------------- | -------------------------------------------- | --------------------------------------- |
+| [homepage](apps/homepage/)      | `czubinski.dev`                              | public                                  |
+| [atlas](apps/atlas/)            | `atlas.czubinski.dev`                        | public                                  |
+| [meetly](apps/meetly/)          | `meetly.czubinski.dev`                       | public                                  |
 | [Argo CD](infra/argocd/)        | `argocd.czubinski.dev`, `argo.czubinski.dev` | VPN, webhook public for GitHub IPs only |
-| [Beszel](tools/beszel/)         | `beszel.czubinski.dev`              | VPN                             |
-| [ConvertX](tools/convertx/)     | `convert.czubinski.dev`             | VPN                             |
-| [Gatus](tools/gatus/)           | `gatus.czubinski.dev`               | VPN                             |
-| [Stirling PDF](tools/stirling/) | `stirling.czubinski.dev`            | VPN                             |
-| [Syncthing](tools/syncthing/)   | `syncthing.czubinski.dev`, `:22000` | VPN                             |
-| [Samba](tools/samba/)           | `:445`                              | VPN                             |
+| [Beszel](tools/beszel/)         | `beszel.czubinski.dev`                       | VPN                                     |
+| [ConvertX](tools/convertx/)     | `convert.czubinski.dev`                      | VPN                                     |
+| [Gatus](tools/gatus/)           | `gatus.czubinski.dev`                        | VPN                                     |
+| [Stirling PDF](tools/stirling/) | `stirling.czubinski.dev`                     | VPN                                     |
+| [Syncthing](tools/syncthing/)   | `syncthing.czubinski.dev`, `:22000`          | VPN                                     |
+| [Samba](tools/samba/)           | `:445`                                       | VPN                                     |
 
 Tool details and where their data lives: [.docs/tools.md](.docs/tools.md).
 
 ## Networking
 
-- **Public:** `*.czubinski.dev` is proxied by Cloudflare and reaches the cluster through the `cloudflared` tunnel, landing on Traefik's `public` entrypoint. No ports are opened on the router.
-- **VPN:** `vpn.czubinski.dev` is kept up to date with DynDNS. Connected devices reach Traefik's private entrypoints on `192.168.0.1`.
-- **Traefik:** entrypoints decide where traffic comes in, middlewares ([infra/traefik/](infra/traefik/)) decide who gets through.
+- **Public:** `*.czubinski.dev` goes through Cloudflare and the `cloudflared` tunnel to Traefik's `public` entrypoint. No ports are opened on the router.
+- **VPN:** WireGuard via `vpn.czubinski.dev` (DynDNS). Connected devices reach Traefik's private entrypoints on `192.168.0.1`.
 
-Diagrams per flow and ingress annotation snippets: [.docs/network.md](.docs/network.md).
+Diagrams, firewall, Traefik entrypoints and ingress snippets: [.docs/network.md](.docs/network.md).
 
 ## Roadmap
 

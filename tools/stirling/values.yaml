@@ -5,9 +5,20 @@ image:
   repository: stirlingtools/stirling-pdf
   tag: 3.0.0
 
+strategy:
+  type: Recreate
+
 envs:
   - name: SECURITY_ENABLELOGIN
     value: "false"
+  - name: SYSTEM_ENABLEANALYTICS
+    value: "false"
+  - name: SYSTEM_MAXFILESIZE
+    value: "200"
+  - name: SYSTEM_DEFAULTLOCALE
+    value: en-GB
+  - name: JAVA_CUSTOM_OPTS
+    value: "-Xmx2g -XX:InitialRAMPercentage=0.5 -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=30"
 
 containerSecurityContext:
   allowPrivilegeEscalation: false

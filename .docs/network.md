@@ -50,16 +50,14 @@ Server (firewalld):
 
 Inside the cluster, ingress to app and tool namespaces is default-deny: a pod accepts traffic only from the `traefik` namespace. Egress is not restricted.
 
-| namespace                                                | policy                      | allows                                                     |
-| -------------------------------------------------------- | --------------------------- | ---------------------------------------------------------- |
-| `apps/*` (atlas, homepage, meetly), from `charts/app`    | `traefik-to-<app>`          | `traefik` namespace and pods from the same namespace       |
-| `tools/*` (beszel, convertx, gatus, samba, stirling, syncthing) | `traefik-to-<tool>`         | `traefik` namespace only                                   |
-| `tools/*` (beszel, convertx, samba, stirling, syncthing) | `gatus-to-<tool>`           | `gatus` namespace, so Gatus can probe the services         |
-| `postgres`                                               | `nobody-to-postgres`        | nothing (default-deny)                                     |
-| `postgres`                                               | `operator-to-postgres`      | `cnpg-system` to `pg` on `5432`, `8000`                    |
-| `postgres`                                               | `<app>-to-postgres`         | the `<app>` namespace on `5432` (now: atlas)               |
-| `argocd`                                                 | `argocd-*` (from the chart) | the chart's own per-component rules                        |
-| `cloudflared`                                            | `nobody-to-cloudflared`     | nothing (default-deny), it only makes outbound connections |
+| namespace                                                       | policy                      | allows                                                                      |
+| --------------------------------------------------------------- | --------------------------- | --------------------------------------------------------------------------- |
+| `apps/*` (atlas, homepage, meetly), from `charts/app`           | `traefik-to-<app>`          | `traefik` namespace and pods from the same namespace                        |
+| `tools/*` (beszel, convertx, gatus, samba, stirling, syncthing) | `traefik-to-<tool>`         | `traefik` namespace only                                                    |
+| `tools/*` (beszel, convertx, samba, stirling, syncthing)        | `gatus-to-<tool>`           | `gatus` namespace, so Gatus can probe the services                          |
+| `postgres`                                                      | `*-to-postgres`             | default-deny, then operator and apps, see [database.md](database.md#access) |
+| `argocd`                                                        | `argocd-*` (from the chart) | the chart's own per-component rules                                         |
+| `cloudflared`                                                   | `nobody-to-cloudflared`     | nothing (default-deny), it only makes outbound connections                  |
 
 Not covered: `traefik`, `sealed-secrets` and `cnpg-system` have no policy on purpose, so they accept all traffic. Traefik receives VPN traffic through `hostPort`. The `beszel-agent` runs with `hostNetwork`, so policies don't apply to it.
 
@@ -89,10 +87,6 @@ traefik.ingress.kubernetes.io/router.middlewares: default-http-vpn-only@kubernet
 
 # public
 traefik.ingress.kubernetes.io/router.entrypoints: public
-
-# public, GitHub only
-traefik.ingress.kubernetes.io/router.entrypoints: public
-traefik.ingress.kubernetes.io/router.middlewares: default-http-gh-only@kubernetescrd
 ```
 
 An ingress without the `entrypoints` annotation lands on `websecure` (`asDefault: true`) without any middleware.
