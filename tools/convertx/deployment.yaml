@@ -5,6 +5,8 @@ metadata:
   namespace: convertx
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 3
   selector:
     matchLabels:
@@ -29,8 +31,14 @@ spec:
           env:
             - name: TZ
               value: Europe/Warsaw
+            - name: LANGUAGE
+              value: en-GB
             - name: ALLOW_UNAUTHENTICATED
               value: "true"
+            - name: AUTO_DELETE_EVERY_N_HOURS
+              value: "24"
+            - name: MAX_CONVERT_PROCESS
+              value: "3"
           ports:
             - containerPort: 3000
           volumeMounts:
