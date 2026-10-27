@@ -26,6 +26,32 @@
       "enabled": false
     },
     {
+      "description": "The helm datasource sets its own topic (\"Helm release ...\"), which beats the global one",
+      "matchDatasources": ["helm"],
+      "commitMessageTopic": "{{{replace \"^.*/\" \"\" depName}}}"
+    },
+    {
+      "description": "Commit name is the Application, not the chart (argo-cd)",
+      "matchPackageNames": ["argo-cd"],
+      "commitMessageTopic": "argocd"
+    },
+    {
+      "description": "Commit name is the Application, not the chart (cloudnative-pg)",
+      "matchPackageNames": ["cloudnative-pg"],
+      "commitMessageTopic": "cnpg"
+    },
+    {
+      "description": "Stirling: the image is the app version, so it gets the plain name",
+      "matchPackageNames": ["docker.io/stirlingtools/stirling-pdf"],
+      "commitMessageTopic": "stirling"
+    },
+    {
+      "description": "Stirling: a chart bump has no v{version}, so git log --grep \"^stirling v\" lists only image versions",
+      "matchPackageNames": ["stirling-pdf-chart"],
+      "commitMessageTopic": "stirling: helm chart",
+      "commitMessageExtra": "{{{newVersion}}}"
+    },
+    {
       "description": "Skip patch bumps",
       "matchUpdateTypes": ["patch"],
       "enabled": false
@@ -33,13 +59,18 @@
     {
       "description": "Samba tags look like smbd-only-a<alpine>-s<samba>-r<rev>; track the samba version",
       "matchPackageNames": ["ghcr.io/servercontainers/samba"],
-      "versioning": "regex:^smbd-only-a\\d+\\.\\d+\\.\\d+-s(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-r(?<build>\\d+)$",
+      "versioning": "regex:^smbd-only-a\\d+\\.\\d+\\.\\d+-s(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-r(?<build>\\d+)$"
+    },
+    {
+      "description": "Samba: show the samba version in the commit message",
+      "matchPackageNames": ["ghcr.io/servercontainers/samba"],
       "matchUpdateTypes": ["major", "minor"],
+      "commitMessageExtra": "{{{replace \"^.*-s([0-9]+[.][0-9]+[.][0-9]+)-r[0-9]+$\" \"v$1\" newVersion}}}",
       "enabled": true
     }
   ],
   "semanticCommits": "disabled",
   "commitMessageAction": "",
-  "commitMessageTopic": "{{{replace \"^.*/\" \"\" depName}}}:",
+  "commitMessageTopic": "{{{replace \"^.*/\" \"\" depName}}}",
   "commitMessageExtra": "{{{replace \"^v?\" \"v\" newVersion}}}"
 }
