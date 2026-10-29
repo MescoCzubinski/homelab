@@ -21,7 +21,7 @@ Single-node Kubernetes homelab on a Mac Mini, run with k0s and managed by Argo C
 ## File structure
 
 ```
-.github/          CI workflow
+.github/          CI and chart publish workflows
 cluster/          k0s cluster config
 charts/
   app/            Helm chart for my own apps
@@ -48,7 +48,7 @@ tools/            self-hosted tools
 .docs/            docs and diagrams
 ```
 
-Every app in `apps/` is a `values.yaml` for the shared [charts/app](charts/app/) Helm chart (Deployment, Service, Ingress), plus `sealed-secret.yaml` if needed. Every tool in `tools/` has its own Application: a plain directory of manifests, or `values.yaml` for an upstream chart where a usable one exists (now: Stirling PDF, Gatus). Argo CD entrypoint is [infra/argocd/applications/](infra/argocd/applications/), details in [.docs/argocd.md](.docs/argocd.md).
+Every app in `apps/` is a `values.yaml` for the shared [charts/app](charts/app/) Helm chart (Deployment, Service, Ingress), plus `sealed-secret.yaml` if needed. The chart is published to GHCR as `ghcr.io/mescoczubinski/charts/app` when a tag `vX.Y.Z` is pushed, and every app pins a version of it. The version lives in [Chart.yaml](charts/app/Chart.yaml), the tag has to match it. Every tool in `tools/` has its own Application: a plain directory of manifests, or `values.yaml` for an upstream chart where a usable one exists (now: Stirling PDF, Gatus). Argo CD entrypoint is [infra/argocd/applications/](infra/argocd/applications/), details in [.docs/argocd.md](.docs/argocd.md).
 
 ## Services
 

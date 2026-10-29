@@ -20,7 +20,7 @@ One parent Application, `argocd`, manages Argo itself and every file in `infra/a
 
 ## Multi-source
 
-Applications that deploy a Helm chart (`argocd`, `traefik`, `sealed-secrets`, `argocd-image-updater`, `kube-vip`, `gatus`, `stirling` and everything in `apps/`) use up to three sources, so the chart comes from upstream (or `charts/app`) and the values stay in this repo:
+Applications that deploy a Helm chart (`argocd`, `traefik`, `sealed-secrets`, `argocd-image-updater`, `kube-vip`, `gatus`, `stirling` and everything in `apps/`) use up to three sources, so the chart comes from upstream (or `charts/app`, published to GHCR) and the values stay in this repo:
 
 1. Helm chart, values from `$values/...`
 2. this repo, only `ref: values`, so `$values` points at it

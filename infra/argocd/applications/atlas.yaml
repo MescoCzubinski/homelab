@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   sources:
-    - repoURL: git@github.com:MescoCzubinski/homelab.git
-      targetRevision: main
-      path: charts/app
+    - repoURL: ghcr.io/mescoczubinski/charts
+      chart: app
+      targetRevision: 0.1.0
       helm:
         releaseName: atlas
         valueFiles:

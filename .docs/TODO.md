@@ -29,11 +29,14 @@
 - [x] kube-vip — control plane VIP with k0sctl config
 - [x] Helm charts for tools — upstream where they exist
 - [x] Gatus — status page and uptime checks for everything
+- [x] Versioned app chart — OCI on GHCR, apps pin a version
+- [ ] Postgres per app — independent CNPG cluster for each app
 - [ ] Cloudflare config in repo — DNS and tunnels (OpenTofu)
-- [ ] Error pages — styled 502, 503 and 504 via Traefik
-- [ ] Cloudflare custom pages — HTML for 5XX and tunnel errors
+- [ ] Discord webhooks — alerts from Gatus and Argo CD
+- [ ] API and etcd via VIP — move both onto the existing VIP
+- [ ] Auto backup — scheduled backups of data and Postgres (CNPG)
+- [ ] Error pages — styled 502, 503 and 504 via Traefik, 5XX and tunnel errors via Cloudflare
 - [ ] Monitoring — metrics and dashboards (Prometheus/Grafana)
-- [ ] Auto backup — scheduled backups of data and Postgres
 
 ## Apps
 

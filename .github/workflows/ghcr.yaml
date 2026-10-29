@@ -1,0 +1,23 @@
+name: ghcr
+on:
+  push:
+    tags:
+      - "v*.*.*"
+permissions:
+  contents: read
+  packages: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          version=$(yq -r .version charts/app/Chart.yaml)
+          [ "$GITHUB_REF_NAME" = "v$version" ] || { echo "::error::tag $GITHUB_REF_NAME doesn't match version $version in charts/app/Chart.yaml"; exit 1; }
+      - run: helm package charts/app
+      - run: helm push app-*.tgz oci://ghcr.io/mescoczubinski/charts

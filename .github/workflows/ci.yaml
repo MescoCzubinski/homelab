@@ -22,17 +22,23 @@ jobs:
       - name: Render Helm charts of all Applications
         run: |
           for app in infra/argocd/applications/*.yaml; do
-            yq -r '. as $a | (.spec.sources // [.spec.source])[] | select(has("helm")) | [$a.metadata.name, .helm.releaseName // $a.metadata.name, $a.spec.destination.namespace, .chart // "-", .repoURL, .targetRevision, .path // "-", ((.helm.valueFiles // []) | map(sub("^\\$values/"; "")) | join(" -f ") | select(. != "") // "-")] | @tsv' "$app"
-          done | grep . | while IFS=$'\t' read -r name release ns chart repo rev path values; do
+            yq -r '. as $a | (.spec.sources // [.spec.source])[] | select(has("helm")) | [$a.metadata.name, .helm.releaseName // $a.metadata.name, $a.spec.destination.namespace, .chart, .repoURL, .targetRevision, ((.helm.valueFiles // []) | map(sub("^\\$values/"; "")) | join(" -f ") | select(. != "") // "-")] | @tsv' "$app"
+          done | grep . | while IFS=$'\t' read -r name release ns chart repo rev values; do
             args=(--kube-version "$KUBERNETES_VERSION" -n "$ns")
             [ "$values" != "-" ] && args+=(-f $values)
-            if [ "$chart" != "-" ]; then
+            if [[ "$repo" == *://* ]]; then
               helm template "$release" "$chart" --repo "$repo" --version "$rev" "${args[@]}"
             else
-              helm lint "$path" "${args[@]:2}" >&2
-              helm template "$release" "$path" "${args[@]}"
+              helm template "$release" "oci://$repo/$chart" --version "$rev" "${args[@]}"
             fi
           done > rendered.yaml
+      - name: Render charts/app with the values of every app
+        run: |
+          for values in apps/*/values.yaml; do
+            app=$(basename "$(dirname "$values")")
+            helm lint charts/app -n "$app" -f "$values" >&2
+            helm template "$app" charts/app --kube-version "$KUBERNETES_VERSION" -n "$app" -f "$values"
+          done >> rendered.yaml
       - name: Validate rendered charts
         run: kubeconform -strict -summary -ignore-missing-schemas -kubernetes-version "$KUBERNETES_VERSION" -skip SealedSecret < rendered.yaml
       - name: Validate plain manifests
