@@ -2,9 +2,11 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "timezone": "Europe/Warsaw",
+  "prConcurrentLimit": 6,
+  "prHourlyLimit": 2,
   "dependencyDashboardApproval": false,
   "minimumReleaseAge": "3 days",
-  "schedule": ["before 6am on monday"],
+  "rebaseWhen": "conflicted",
   "kubernetes": {
     "managerFilePatterns": [
       "/^tools/.+\\.ya?ml$/",
