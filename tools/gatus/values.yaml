@@ -59,12 +59,6 @@ config:
       interval: 5m
       conditions:
         - "[CONNECTED] == true"
-    - name: Postgres
-      group: infra
-      url: "tcp://pg-rw.postgres.svc.cluster.local:5432"
-      interval: 5m
-      conditions:
-        - "[CONNECTED] == true"
     - name: ArgoCD
       group: tools
       url: "http://argocd-server.argocd.svc.cluster.local/healthz"
