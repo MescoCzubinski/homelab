@@ -48,18 +48,35 @@ Server (firewalld):
 
 ## NetworkPolicies
 
-Inside the cluster, ingress to app and tool namespaces is default-deny: a pod accepts traffic only from the `traefik` namespace. Egress is not restricted.
+Inside the cluster, ingress to app and tool namespaces is default-deny: a pod accepts traffic only from the `traefik` namespace. Egress is restricted for `postgres`, see [Egress](#egress).
 
-| namespace                                                       | policy                      | allows                                                                      |
-| --------------------------------------------------------------- | --------------------------- | --------------------------------------------------------------------------- |
-| `apps/*` (atlas, homepage, meetly), from `charts/app`           | `traefik-to-<app>`          | `traefik` namespace and pods from the same namespace                        |
-| `tools/*` (beszel, convertx, gatus, samba, stirling, syncthing) | `traefik-to-<tool>`         | `traefik` namespace only                                                    |
-| `tools/*` (beszel, convertx, samba, stirling, syncthing)        | `gatus-to-<tool>`           | `gatus` namespace, so Gatus can probe the services                          |
-| `postgres`                                                      | `*-to-postgres`             | default-deny, then operator and apps, see [database.md](database.md#access) |
-| `argocd`                                                        | `argocd-*` (from the chart) | the chart's own per-component rules                                         |
-| `cloudflared`                                                   | `nobody-to-cloudflared`     | nothing (default-deny), it only makes outbound connections                  |
+| namespace                                                       | policy                                 | allows                                                                         |
+| --------------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------ |
+| `apps/*` (atlas, homepage, meetly), from `charts/app`           | `traefik-to-<app>`                     | `traefik` namespace and pods from the same namespace                           |
+| `tools/*` (beszel, convertx, gatus, samba, stirling, syncthing) | `traefik-to-<tool>`                    | `traefik` namespace only                                                       |
+| `tools/*` (beszel, convertx, samba, stirling, syncthing)        | `gatus-to-<tool>`                      | `gatus` namespace, so Gatus can probe the services                             |
+| `postgres`                                                      | `*-to-postgres`                        | default-deny, then operator and apps, see [database.md](database.md#access)    |
+| `argocd`                                                        | `nobody-to-argocd`                     | default-deny for the namespace                                                 |
+| `argocd`                                                        | `argocd-to-argocd`                     | pods from the same namespace (Argo CD components, Image Updater)               |
+| `argocd`                                                        | `traefik-to-argocd`, `gatus-to-argocd` | `traefik` and `gatus` namespaces to `argocd-server` only                       |
+| `cloudflared`                                                   | `nobody-to-cloudflared`                | nothing (default-deny), it only makes outbound connections                     |
+| `traefik`                                                       | `cloudflared-to-traefik`               | `public` entrypoint (`8001`) from the `cloudflared` namespace only             |
+| `traefik`                                                       | `vpn-to-traefik`                       | `443`, `445`, `22000` from anywhere (VPN via `hostPort`)                       |
+| `cnpg-system`                                                   | `apiserver-to-cnpg`                    | webhook port `9443` from anywhere, the API server runs on the host network     |
+| `sealed-secrets`                                                | `apiserver-to-sealed-secrets`          | `8080` from anywhere, `kubeseal` reaches the controller through the API server |
 
-Not covered: `traefik`, `sealed-secrets` and `cnpg-system` have no policy on purpose, so they accept all traffic. Traefik receives VPN traffic through `hostPort`. The `beszel-agent` runs with `hostNetwork`, so policies don't apply to it.
+Not covered: `kube-system`. The `beszel-agent` runs with `hostNetwork`, so policies don't apply to it.
+
+### Egress
+
+`postgres` reaches only what CloudNativePG needs.
+
+| namespace  | policy                  | allows                                |
+| ---------- | ----------------------- | ------------------------------------- |
+| `postgres` | `postgres-to-dns`       | `kube-dns` on `53`                    |
+| `postgres` | `postgres-to-apiserver` | the API server (`192.168.1.100:6443`) |
+
+`postgres-to-apiserver` has to change when the API moves to the VIP. Backups to object storage will need a new `postgres-to-*` policy.
 
 ## Traefik
 

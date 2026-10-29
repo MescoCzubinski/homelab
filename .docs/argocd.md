@@ -15,7 +15,7 @@
 One parent Application, `argocd`, manages Argo itself and every file in `infra/argocd/applications/`. The parent deploys:
 
 - the Argo CD chart itself
-- the GUI ingress from the chart (`server.ingress`), `ingress-gh.yaml` and `sealed-secret.yaml` from `infra/argocd`
+- the GUI ingress from the chart (`server.ingress`), `ingress-gh.yaml`, `sealed-secret.yaml` and `networkpolicy.yaml` from `infra/argocd`
 - one child Application per file in `applications/`
 
 ## Multi-source
@@ -28,7 +28,7 @@ Applications that deploy a Helm chart (`argocd`, `traefik`, `sealed-secrets`, `a
 
 Source 3 is optional. It is how plain manifests are deployed together with a chart.
 
-Applications with plain manifests (`beszel`, `convertx`, `samba`, `syncthing`, `cloudflared`, `postgres`) have a single source: a `path` in this repo. `cnpg` has a single source too, the upstream chart with default values.
+Applications with plain manifests (`beszel`, `convertx`, `samba`, `syncthing`, `cloudflared`, `postgres`) have a single source: a `path` in this repo. `cnpg` uses the upstream chart with default values, plus `infra/cnpg` for its NetworkPolicy.
 
 ## Webhook
 

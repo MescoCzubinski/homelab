@@ -1,5 +1,7 @@
 global:
   domain: argocd.czubinski.dev
+  networkPolicy:
+    create: false
 
 configs:
   cm:

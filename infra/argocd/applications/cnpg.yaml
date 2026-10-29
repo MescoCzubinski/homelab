@@ -5,12 +5,15 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  source:
-    repoURL: https://cloudnative-pg.github.io/charts
-    chart: cloudnative-pg
-    targetRevision: 0.29.1
-    helm:
-      releaseName: cnpg
+  sources:
+    - repoURL: https://cloudnative-pg.github.io/charts
+      chart: cloudnative-pg
+      targetRevision: 0.29.1
+      helm:
+        releaseName: cnpg
+    - repoURL: git@github.com:MescoCzubinski/homelab.git
+      targetRevision: main
+      path: infra/cnpg
   destination:
     server: https://kubernetes.default.svc
     namespace: cnpg-system

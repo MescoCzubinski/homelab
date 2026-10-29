@@ -21,10 +21,12 @@ A static `local` PersistentVolume ([persistentvolume.yaml](../infra/postgres/per
 
 [NetworkPolicies](../infra/postgres/networkpolicy.yaml) in the `postgres` namespace:
 
-| policy                 | allows                                                                                 |
-| ---------------------- | -------------------------------------------------------------------------------------- |
-| `nobody-to-postgres`   | default-deny ingress for the namespace                                                 |
-| `operator-to-postgres` | `cnpg-system` to `pg` on `5432` and `8000` (status)                                    |
-| `<app>-to-postgres`    | the `<app>` namespace to `pg` on `5432`, one policy per app (now: `atlas-to-postgres`) |
+| policy                  | allows                                                                                 |
+| ----------------------- | -------------------------------------------------------------------------------------- |
+| `nobody-to-postgres`    | default-deny ingress for the namespace                                                 |
+| `operator-to-postgres`  | `cnpg-system` to `pg` on `5432` and `8000` (status)                                    |
+| `<app>-to-postgres`     | the `<app>` namespace to `pg` on `5432`, one policy per app (now: `atlas-to-postgres`) |
+| `postgres-to-dns`       | egress to `kube-dns` on `53`                                                           |
+| `postgres-to-apiserver` | egress to the API server (`192.168.1.100:6443`), the only other egress allowed         |
 
 Namespaces are matched by their automatic `kubernetes.io/metadata.name` label, so there is no label to set by hand.

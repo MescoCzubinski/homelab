@@ -29,6 +29,7 @@ infra/
   argocd/         Argo CD itself + applications/
   argocd-image-updater/ Image Updater + ImageUpdater CRs
   cloudflared/    Cloudflare Tunnel
+  cnpg/           NetworkPolicy for the CloudNativePG operator
   kube-vip/       Virtual IP for the API server
   postgres/       Postgres cluster (the CloudNativePG operator comes from the upstream chart)
   sealed-secrets/ Sealed Secrets controller
