@@ -3,6 +3,8 @@ host: ""
 
 access: vpn
 
+postgres: false
+
 imagePullSecrets:
   - ghcr-pull
 

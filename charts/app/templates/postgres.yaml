@@ -1,0 +1,18 @@
+{{- if .Values.postgres }}
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ .Release.Name }}-pg
+  namespace: {{ .Release.Namespace }}
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.9
+  enableSuperuserAccess: false
+  storage:
+    storageClass: local-postgres
+    size: 10Gi
+  bootstrap:
+    initdb:
+      database: {{ .Release.Name }}
+      owner: {{ .Release.Name }}
+{{- end }}
