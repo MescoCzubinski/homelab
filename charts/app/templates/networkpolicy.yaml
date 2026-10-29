@@ -4,7 +4,10 @@ metadata:
   name: traefik-to-{{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
 spec:
-  podSelector: {}
+  podSelector:
+    matchExpressions:
+      - key: cnpg.io/cluster
+        operator: DoesNotExist
   policyTypes:
     - Ingress
   ingress:
@@ -44,7 +47,10 @@ metadata:
   name: {{ .Release.Name }}-to-internet
   namespace: {{ .Release.Namespace }}
 spec:
-  podSelector: {}
+  podSelector:
+    matchExpressions:
+      - key: cnpg.io/cluster
+        operator: DoesNotExist
   policyTypes:
     - Egress
   egress:
@@ -78,6 +84,23 @@ spec:
       ports:
         - port: 5432
         - port: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-to-{{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      cnpg.io/cluster: {{ .Release.Name }}-pg
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+      ports:
+        - port: 5432
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
