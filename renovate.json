@@ -59,6 +59,11 @@
       "enabled": false
     },
     {
+      "description": "Minor bumps once a month, majors any time",
+      "matchUpdateTypes": ["minor"],
+      "schedule": ["* * 1 * *"]
+    },
+    {
       "description": "Samba tags look like smbd-only-a<alpine>-s<samba>-r<rev>; track the samba version",
       "matchPackageNames": ["ghcr.io/servercontainers/samba"],
       "versioning": "regex:^smbd-only-a\\d+\\.\\d+\\.\\d+-s(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-r(?<build>\\d+)$"
