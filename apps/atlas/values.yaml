@@ -1,4 +1,5 @@
 access: public
+postgres: true
 
 components:
   - name: atlas-backend
@@ -32,7 +33,7 @@ components:
       GRAPHHOPPER_URL: atlas-graphhopper
       GRAPHHOPPER_TOKEN: atlas-graphhopper
       EMBEDDING_API_TOKEN: atlas-embedding
-      DATABASE_URL: atlas-database-url
+      DATABASE_URL: atlas-pg-app/uri
   - name: atlas-frontend
     runAsUser: 1000
     image:
@@ -73,5 +74,5 @@ components:
       - name: INTERVAL_SECONDS
         value: "604800"
     secretEnv:
-      DB_URL: atlas-database-url
+      DB_URL: atlas-pg-app/uri
       EMBEDDING_API_TOKEN: atlas-embedding

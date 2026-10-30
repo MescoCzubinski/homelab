@@ -8,6 +8,7 @@
     "domain": { "type": "string" },
     "host": { "type": "string" },
     "access": { "enum": ["public", "vpn", "github"] },
+    "postgres": { "type": "boolean" },
     "imagePullSecrets": { "type": "array", "items": { "type": "string" } },
     "securityContext": { "type": "object" },
     "components": {
@@ -37,7 +38,7 @@
             "properties": { "path": { "type": "string", "pattern": "^/" } }
           },
           "env": { "type": "array" },
-          "secretEnv": { "type": "object", "additionalProperties": { "type": "string" } },
+          "secretEnv": { "type": "object", "additionalProperties": { "type": "string", "pattern": "^[^/]+(/[^/]+)?$" } },
           "runAsUser": { "type": "integer" },
           "securityContext": { "type": "object" },
           "resources": { "type": "object" }

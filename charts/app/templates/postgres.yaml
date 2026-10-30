@@ -1,8 +1,9 @@
+{{- if .Values.postgres }}
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: pg
-  namespace: postgres
+  name: {{ .Release.Name }}-pg
+  namespace: {{ .Release.Namespace }}
 spec:
   instances: 1
   imageName: ghcr.io/cloudnative-pg/postgresql:17.9
@@ -10,10 +11,8 @@ spec:
   storage:
     storageClass: local-postgres
     size: 10Gi
-  managed:
-    roles:
-      - name: atlas
-        ensure: present
-        login: true
-        passwordSecret:
-          name: atlas-db
+  bootstrap:
+    initdb:
+      database: {{ .Release.Name }}
+      owner: {{ .Release.Name }}
+{{- end }}

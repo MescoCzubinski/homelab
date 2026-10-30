@@ -3,12 +3,14 @@ kind: Application
 metadata:
   name: atlas
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   project: default
   sources:
     - repoURL: ghcr.io/mescoczubinski/charts
       chart: app
-      targetRevision: 0.1.0
+      targetRevision: 0.2.0
       helm:
         releaseName: atlas
         valueFiles:

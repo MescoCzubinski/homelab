@@ -21,6 +21,7 @@ jobs:
           sudo mv kubeconform /usr/local/bin/
       - name: Render Helm charts of all Applications
         run: |
+          local_version=$(yq -r .version charts/app/Chart.yaml)
           for app in infra/argocd/applications/*.yaml; do
             yq -r '. as $a | (.spec.sources // [.spec.source])[] | select(has("helm")) | [$a.metadata.name, .helm.releaseName // $a.metadata.name, $a.spec.destination.namespace, .chart, .repoURL, .targetRevision, ((.helm.valueFiles // []) | map(sub("^\\$values/"; "")) | join(" -f ") | select(. != "") // "-")] | @tsv' "$app"
           done | grep . | while IFS=$'\t' read -r name release ns chart repo rev values; do
@@ -28,8 +29,10 @@ jobs:
             [ "$values" != "-" ] && args+=(-f $values)
             if [[ "$repo" == *://* ]]; then
               helm template "$release" "$chart" --repo "$repo" --version "$rev" "${args[@]}"
-            else
-              helm template "$release" "oci://$repo/$chart" --version "$rev" "${args[@]}"
+            elif ! helm template "$release" "oci://$repo/$chart" --version "$rev" "${args[@]}"; then
+              [ "$repo/$chart" = "ghcr.io/mescoczubinski/charts/app" ] && [ "$rev" = "$local_version" ] || exit 1
+              echo "::warning::app $rev is not on GHCR yet, $name rendered from charts/app" >&2
+              helm template "$release" charts/app "${args[@]}"
             fi
           done > rendered.yaml
       - name: Render charts/app with the values of every app
