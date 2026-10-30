@@ -6,23 +6,13 @@ There are two ways to reach the server. Public traffic goes through Cloudflare a
 
 ![Overview](images/overview.png)
 
-## DNS
-
-Records in Cloudflare (not in this repo):
-
-| record              | points to          | proxied |
-| ------------------- | ------------------ | ------- |
-| `czubinski.dev`     | Cloudflare Tunnel  | yes     |
-| `*.czubinski.dev`   | Cloudflare Tunnel  | yes     |
-| `vpn.czubinski.dev` | home IP, by DynDNS | no      |
-
 ## Public traffic
 
-`*.czubinski.dev` is proxied by Cloudflare, which also terminates TLS. The `cloudflared` pod opens an outbound tunnel to Cloudflare, so public requests come back through it into the cluster and reach Traefik's `public` entrypoint. Tunnel routing is configured in the Cloudflare dashboard, not in this repo.
+`*.czubinski.dev` is proxied by Cloudflare, which also terminates TLS. The `cloudflared` pod opens an outbound tunnel to Cloudflare, so public requests come back through it into the cluster and reach Traefik's `public` entrypoint.
 
 ![Public traffic](images/public.png)
 
-Traefik trusts `X-Forwarded-*` headers from `cloudflared` (`trustedIPs: 10.244.0.0/16`), so apps see the real client IP. The GitHub middleware reads that IP, so it breaks without it.
+Traefik trusts `X-Forwarded-*` headers from `cloudflared` (`trustedIPs: 10.244.0.0/16`), so apps see the real client IP.
 
 ## VPN
 
@@ -48,35 +38,14 @@ Server (firewalld):
 
 ## NetworkPolicies
 
-Inside the cluster, ingress to app and tool namespaces is default-deny: a pod accepts traffic only from the `traefik` namespace. Egress is restricted for `postgres`, see [Egress](#egress).
+Traffic inside the cluster is closed by default and opened one path at a time. Every app, tool and infra namespace is default-deny for incoming traffic, and each policy allows one source to reach one destination. A compromised pod therefore can't reach its neighbours.
 
-| namespace                                                       | policy                                 | allows                                                                         |
-| --------------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------ |
-| `apps/*` (atlas, homepage, meetly), from `charts/app`           | `traefik-to-<app>`                     | `traefik` namespace and pods from the same namespace                           |
-| `tools/*` (beszel, convertx, gatus, samba, stirling, syncthing) | `traefik-to-<tool>`                    | `traefik` namespace only                                                       |
-| `tools/*` (beszel, convertx, samba, stirling, syncthing)        | `gatus-to-<tool>`                      | `gatus` namespace, so Gatus can probe the services                             |
-| `postgres`                                                      | `*-to-postgres`                        | default-deny, then operator and apps, see [database.md](database.md#access)    |
-| `argocd`                                                        | `nobody-to-argocd`                     | default-deny for the namespace                                                 |
-| `argocd`                                                        | `argocd-to-argocd`                     | pods from the same namespace (Argo CD components, Image Updater)               |
-| `argocd`                                                        | `traefik-to-argocd`, `gatus-to-argocd` | `traefik` and `gatus` namespaces to `argocd-server` only                       |
-| `cloudflared`                                                   | `nobody-to-cloudflared`                | nothing (default-deny), it only makes outbound connections                     |
-| `traefik`                                                       | `cloudflared-to-traefik`               | `public` entrypoint (`8001`) from the `cloudflared` namespace only             |
-| `traefik`                                                       | `vpn-to-traefik`                       | `443`, `445`, `22000` from anywhere (VPN via `hostPort`)                       |
-| `cnpg-system`                                                   | `apiserver-to-cnpg`                    | webhook port `9443` from anywhere, the API server runs on the host network     |
-| `sealed-secrets`                                                | `apiserver-to-sealed-secrets`          | `8080` from anywhere, `kubeseal` reaches the controller through the API server |
+- **Apps and tools:** accept traffic only from the `traefik` namespace, so nothing is reachable except through Traefik. Gatus is also allowed in, to probe the services.
+- **Databases:** an app's `<app>-pg` pods accept traffic only from the app itself and from `cnpg-system`, see [database.md](database.md#access).
+- **Public apps:** also have egress rules, because they are the most likely to be compromised. They can reach DNS, their own namespace and the internet, but not the LAN, the node (kubelet, API server) or other namespaces. Only the database reaches the API server, which CloudNativePG needs.
+- **Infra:** `argocd`, `cloudflared`, `traefik`, `cnpg-system` and `sealed-secrets` allow only what they need. `cloudflared` allows nothing in, since it only makes outbound connections. The API server runs on the host network, so the webhook ports of `cnpg-system` and `sealed-secrets` are open to anywhere.
 
-Not covered: `kube-system`. The `beszel-agent` runs with `hostNetwork`, so policies don't apply to it.
-
-### Egress
-
-`postgres` reaches only what CloudNativePG needs.
-
-| namespace  | policy                  | allows                                |
-| ---------- | ----------------------- | ------------------------------------- |
-| `postgres` | `postgres-to-dns`       | `kube-dns` on `53`                    |
-| `postgres` | `postgres-to-apiserver` | the API server (`192.168.1.100:6443`) |
-
-`postgres-to-apiserver` has to change when the API moves to the VIP. Backups to object storage will need a new `postgres-to-*` policy.
+Policies are named `<from>-to-<to>`, after the direction of the traffic they allow, e.g. `traefik-to-<app>` or `<app>-to-dns`. A policy lives in the namespace it protects, and `nobody-to-<namespace>` is the default-deny. The policies of apps come from `charts/app`, those of tools and infra from their own directories.
 
 ## Traefik
 
@@ -91,24 +60,7 @@ Entrypoints decide where traffic comes in. Middlewares decide who is allowed thr
 | `samba-tcp :445`       | VPN                          | TCP VPN only             |
 | `syncthing-tcp :22000` | VPN                          | TCP VPN only             |
 
-Ports in [values.yaml](../infra/traefik/values.yaml): `port` is where Traefik listens in the pod, `exposedPort` is the Service port (used only by `public`), `hostPort` is the port on the VPN IP `192.168.0.1`. `additionalArguments` override entrypoint addresses to `:<port>`, because the chart prefixes them with `hostIP`, which doesn't exist inside the pod.
-
-### Exposing an app
-
-HTTP, pick the annotations:
-
-```yaml
-# private (VPN)
-traefik.ingress.kubernetes.io/router.entrypoints: websecure
-traefik.ingress.kubernetes.io/router.middlewares: default-http-vpn-only@kubernetescrd
-
-# public
-traefik.ingress.kubernetes.io/router.entrypoints: public
-```
-
-An ingress without the `entrypoints` annotation lands on `websecure` (`asDefault: true`) without any middleware.
-
-TCP needs a new entrypoint in [values.yaml](../infra/traefik/values.yaml) (`ports` with `hostPort` + `hostIP`, and a line in `additionalArguments`) and an `IngressRouteTCP`, e.g. [tools/samba/ingress-tcp.yaml](../tools/samba/ingress-tcp.yaml)
+Ports in `values.yaml`: `port` is where Traefik listens in the pod, `exposedPort` is the Service port (used only by `public`), `hostPort` is the port on the VPN IP `192.168.0.1`. `additionalArguments` override entrypoint addresses to `:<port>`, because the chart prefixes them with `hostIP`, which doesn't exist inside the pod.
 
 ## TLS
 

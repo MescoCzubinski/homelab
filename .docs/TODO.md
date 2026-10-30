@@ -30,7 +30,7 @@
 - [x] Helm charts for tools — upstream where they exist
 - [x] Gatus — status page and uptime checks for everything
 - [x] Versioned app chart — OCI on GHCR, apps pin a version
-- [ ] Postgres per app — independent CNPG cluster for each app
+- [x] Postgres per app — independent CNPG cluster for each app
 - [ ] Cloudflare config in repo — DNS and tunnels (OpenTofu)
 - [ ] Discord webhooks — alerts from Gatus and Argo CD
 - [ ] API and etcd via VIP — move both onto the existing VIP

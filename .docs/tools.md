@@ -1,18 +1,16 @@
 # Tools
 
-Self-hosted tools from [tools/](../tools/), each synced by its own [Argo CD](argocd.md) Application. All are VPN-only (see [network.md](network.md)).
+Self-hosted tools, each synced by its own Argo CD Application, either as plain manifests or an upstream Helm chart. All are VPN-only and reachable only through Traefik, and their data lives in `hostPath` under `/home/server/`
 
 ![Tools](images/tools.png)
 
 Dashed `svc` boxes are config only: Traefik reads pod IPs from them and connects to pods directly.
 
-| tool         | what                       | address                             | data on host                           |
-| ------------ | -------------------------- | ----------------------------------- | -------------------------------------- |
-| Beszel       | server monitoring          | `beszel.czubinski.dev`              | `/home/server/beszel/hub-data`         |
-| ConvertX     | file conversion            | `convert.czubinski.dev`             | `/home/server/convertx/data`           |
-| Gatus        | uptime checks, status page | `gatus.czubinski.dev`               | `/home/server/gatus/data` (SQLite)     |
-| Stirling PDF | PDF tools                  | `stirling.czubinski.dev`            | `/home/server/stirling/config`         |
-| Syncthing    | file sync                  | `syncthing.czubinski.dev`, `:22000` | `/home/server/syncthing/{config,data}` |
-| Samba        | network share `Shared`     | `\\192.168.0.1\Shared` (`:445`)     | `/home/server/samba/Shared`            |
+## Addresses and data
 
-All data lives in `hostPath` under `/home/server/`, so that directory is what needs a backup.
+- **Beszel:** server monitoring at `beszel.czubinski.dev`, data in `/home/server/beszel/hub-data`
+- **ConvertX:** file conversion at `convert.czubinski.dev`, data in `/home/server/convertx/data`
+- **Gatus:** uptime checks and status page at `gatus.czubinski.dev`, data in `/home/server/gatus/data` (SQLite)
+- **Stirling PDF:** PDF tools at `stirling.czubinski.dev`, data in `/home/server/stirling/config`
+- **Syncthing:** file sync at `syncthing.czubinski.dev` and `:22000`, data in `/home/server/syncthing/{config,data}`
+- **Samba:** network share `Shared` at `\\192.168.0.1\Shared` (`:445`), data in `/home/server/samba/Shared`
