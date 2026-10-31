@@ -35,6 +35,7 @@ infra/
   kube-vip/              API server VIP
   sealed-secrets/        Sealed Secrets
   traefik/               Traefik, middlewares
+scripts/                 helper scripts, on PATH through flake.nix
 tools/                   private tools
   beszel/
   convertx/

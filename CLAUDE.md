@@ -18,11 +18,10 @@ kubeconform -strict -summary -ignore-missing-schemas -kubernetes-version 1.36.2 
   -ignore-filename-pattern 'values.yaml' -ignore-filename-pattern 'k0sctl.yaml' tools infra
 ```
 
-Seal a secret with the repo's public cert, then add `argocd.argoproj.io/sync-wave: "-1"` to the SealedSecret's metadata, as every existing `sealed-secret.yaml` has it. Pipe the plaintext in or keep it in the scratchpad, never in the repo:
+Seal a secret with `scripts/create-secret.sh`, on `PATH` through `flake.nix` (direnv or `nix develop`). It creates or updates the namespace's `sealed-secret.yaml`. Leave out `value` for a hidden prompt, so the plaintext stays out of shell history. A new file deploys only if its Application's `directory.include` lists it.
 
 ```sh
-kubectl create secret generic <name> -n <namespace> --from-literal=key=... --dry-run=client -o yaml \
-  | kubeseal --cert infra/sealed-secrets/pub-cert.pem --format yaml > <dir>/sealed-secret.yaml
+create-secret.sh <namespace> <name> [key] [value]
 ```
 
 ## Architecture
