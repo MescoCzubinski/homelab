@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
   "timezone": "Europe/Warsaw",
   "prConcurrentLimit": 6,
   "prHourlyLimit": 2,
@@ -59,8 +59,19 @@
       "enabled": false
     },
     {
-      "description": "Minor bumps once a month, majors any time",
-      "matchUpdateTypes": ["minor"],
+      "description": "Most exposed components: keep a patch separate from a pending minor",
+      "matchPackageNames": ["argo-cd", "traefik", "cloudflare/cloudflared"],
+      "separateMinorPatch": true
+    },
+    {
+      "description": "Most exposed components: patch bumps any time",
+      "matchPackageNames": ["argo-cd", "traefik", "cloudflare/cloudflared"],
+      "matchUpdateTypes": ["patch"],
+      "enabled": true
+    },
+    {
+      "description": "Minor and digest bumps once a month, majors any time",
+      "matchUpdateTypes": ["minor", "digest"],
       "schedule": ["* * 1 * *"]
     },
     {
