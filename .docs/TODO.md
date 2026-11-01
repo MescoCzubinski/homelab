@@ -32,7 +32,7 @@
 - [x] Versioned app chart — OCI on GHCR, apps pin a version
 - [x] Postgres per app — independent CNPG cluster for each app
 - [ ] Cloudflare config in repo — DNS and tunnels (OpenTofu)
-- [ ] Discord webhooks — alerts from Gatus and Argo CD
+- [x] Discord webhooks — alerts from Gatus and Argo CD
 - [ ] API and etcd via VIP — move both onto the existing VIP
 - [ ] Auto backup — scheduled backups of data and Postgres (CNPG)
 - [ ] Error pages — styled 502, 503 and 504 via Traefik, 5XX and tunnel errors via Cloudflare

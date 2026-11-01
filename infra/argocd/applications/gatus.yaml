@@ -20,7 +20,7 @@ spec:
       targetRevision: main
       path: tools/gatus
       directory:
-        include: "networkpolicy.yaml"
+        include: "{sealed-secret.yaml,networkpolicy.yaml}"
   destination:
     server: https://kubernetes.default.svc
     namespace: gatus

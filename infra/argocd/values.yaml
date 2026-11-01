@@ -23,4 +23,93 @@ dex:
   enabled: false
 
 notifications:
-  enabled: false
+  secret:
+    create: false
+  notifiers:
+    service.webhook.discord: |
+      url: $discord-webhook-url
+      headers:
+        - name: Content-Type
+          value: application/json
+  subscriptions:
+    - recipients:
+        - discord
+      triggers:
+        - on-sync-failed
+        - on-health-degraded
+        - on-deployed
+        - on-created
+  templates:
+    template.app-sync-failed: |
+      webhook:
+        discord:
+          method: POST
+          body: |
+            {
+              "embeds": [{
+                "title": "{{.app.metadata.name}}: sync {{.app.status.operationState.phase}}",
+                "url": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+                "description": {{.app.status.operationState.message | toString | trunc 2000 | toJson}},
+                "color": 15158332
+              }]
+            }
+    template.app-health-degraded: |
+      webhook:
+        discord:
+          method: POST
+          body: |
+            {
+              "embeds": [{
+                "title": "{{.app.metadata.name}}: {{.app.status.health.status}}",
+                "url": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+                "color": 15158332
+              }]
+            }
+    template.app-deployed: |
+      webhook:
+        discord:
+          method: POST
+          body: |
+            {
+              "embeds": [{
+                "title": "{{.app.metadata.name}}: deployed",
+                "url": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+                "color": 3066993
+              }]
+            }
+    template.app-created: |
+      webhook:
+        discord:
+          method: POST
+          body: |
+            {
+              "embeds": [{
+                "title": "{{.app.metadata.name}}: created",
+                "url": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+                "color": 3447003
+              }]
+            }
+  triggers:
+    trigger.on-sync-failed: |
+      - description: Application syncing has failed
+        send:
+          - app-sync-failed
+        oncePer: app.status.operationState?.finishedAt
+        when: app.status.operationState != nil and app.status.operationState.phase in ['Error', 'Failed']
+    trigger.on-health-degraded: |
+      - description: Application has degraded
+        send:
+          - app-health-degraded
+        when: app.status.health.status == 'Degraded'
+    trigger.on-deployed: |
+      - description: Application is synced and healthy
+        send:
+          - app-deployed
+        oncePer: app.status.operationState?.finishedAt
+        when: app.status.operationState != nil and app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
+    trigger.on-created: |
+      - description: Application is created
+        send:
+          - app-created
+        oncePer: app.metadata.name
+        when: "true"
