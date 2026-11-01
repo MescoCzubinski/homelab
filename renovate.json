@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
   "timezone": "Europe/Warsaw",
   "prConcurrentLimit": 6,
   "prHourlyLimit": 2,
@@ -33,6 +33,17 @@
       "commitMessageTopic": "{{{replace \"^.*/\" \"\" depName}}}"
     },
     {
+      "description": "The docker datasource sets its own topic and extra (\"... Docker tag to ...\"), which beat the global ones",
+      "matchDatasources": ["docker"],
+      "commitMessageTopic": "{{{replace \"^.*/\" \"\" depName}}}",
+      "commitMessageExtra": "{{{replace \"^v?\" \"v\" newVersion}}}"
+    },
+    {
+      "description": "Action bumps are CI changes (\"ci: action v4.7.0\"), not \"<action> action ...\"",
+      "matchManagers": ["github-actions"],
+      "commitMessageTopic": "ci: action"
+    },
+    {
       "description": "Commit name is the Application, not the chart (argo-cd)",
       "matchPackageNames": ["argo-cd"],
       "commitMessageTopic": "argocd"
@@ -59,8 +70,19 @@
       "enabled": false
     },
     {
-      "description": "Minor bumps once a month, majors any time",
-      "matchUpdateTypes": ["minor"],
+      "description": "Most exposed components: keep a patch separate from a pending minor",
+      "matchPackageNames": ["argo-cd", "traefik", "cloudflare/cloudflared"],
+      "separateMinorPatch": true
+    },
+    {
+      "description": "Most exposed components: patch bumps any time",
+      "matchPackageNames": ["argo-cd", "traefik", "cloudflare/cloudflared"],
+      "matchUpdateTypes": ["patch"],
+      "enabled": true
+    },
+    {
+      "description": "Minor and digest bumps once a month, majors any time",
+      "matchUpdateTypes": ["minor", "digest"],
       "schedule": ["* * 1 * *"]
     },
     {

@@ -1,0 +1,7 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "SealedSecret ciphertext"
+regexTarget = "line"
+regexes = ['''^\s+[\w.-]+:\s+Ag[A-Za-z0-9+/=]{100,}$''']

@@ -6,7 +6,7 @@ GitOps repo for a single-node k0s cluster on a Mac Mini (node `myserver.home`, L
 
 ## Commands
 
-No build. CI (`.github/workflows/ci.yaml`) renders every Helm-based Application and validates the output with kubeconform. To check locally:
+No build. CI (`.github/workflows/validate.yaml`) renders every Helm-based Application and validates the output with kubeconform. It fails if `charts/app` differs from the chart published on GHCR under the same version. `.github/workflows/trivy.yaml` scans upstream images every Monday and fails on a CRITICAL CVE that has a fix (`apps/` images are skipped, their tags aren't in git). `.github/workflows/gitleaks.yaml` scans the git history on every push to `main`, `.gitleaks.toml` allows SealedSecret ciphertext. To check locally:
 
 ```sh
 # charts/app with one app's values (repeat for atlas, homepage, meetly)
@@ -47,7 +47,7 @@ The labels are set through the Application's `managedNamespaceMetadata`. Tools k
 **Updates.** Two separate paths, which must not overlap:
 
 - `apps/`: Argo CD Image Updater moves image tags to the newest `vX.Y.Z` on GHCR and writes them to the Application as `helm.parameters`, not to git. `tag: v0.0.1` in `values.yaml` is only a baseline, and Renovate is disabled for `apps/**`.
-- Everything else: Renovate PRs (majors any time, minors on the 1st of the month, patches disabled, 3-day minimum release age). `renovate.json` rewrites commit messages to follow the commit conventions below. If a new package's name doesn't match its directory/Application name, add a `commitMessageTopic` packageRule.
+- Everything else: Renovate PRs (majors any time, minors and action digests on the 1st of the month, patches only for `argo-cd`, `traefik` and `cloudflared`, 3-day minimum release age). `renovate.json` rewrites commit messages to follow the commit conventions below. If a new package's name doesn't match its directory/Application name, add a `commitMessageTopic` packageRule.
 
 **Postgres.** `postgres: true` in an app's values creates a CNPG `Cluster` `<app>-pg` (credentials in the generated `<app>-pg-app` secret, used via `secretEnv`) and its NetworkPolicies. It also needs a static PV in `infra/cnpg/persistentvolumes.yaml` (`claimRef` `<app>/<app>-pg-1`, path `/home/server/postgres/<app>` created by hand on the host) and `sync-wave: "1"` on the Application. Details: `.docs/database.md`.
 

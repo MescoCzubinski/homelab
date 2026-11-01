@@ -1,0 +1,46 @@
+name: trivy
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    env:
+      KUBERNETES_VERSION: 1.36.2
+      TRIVY_VERSION: v0.76.1
+      TRIVY_SHA256: c7cbe3137fb8a48a17574bede3dd6beb16742d1e9772929940fc90082c39d9c0
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install Trivy
+        run: |
+          curl -sSL "https://github.com/aquasecurity/trivy/releases/download/${TRIVY_VERSION}/trivy_${TRIVY_VERSION#v}_Linux-64bit.tar.gz" -o trivy.tar.gz
+          echo "$TRIVY_SHA256  trivy.tar.gz" | sha256sum -c -
+          tar -xzf trivy.tar.gz trivy
+          sudo mv trivy /usr/local/bin/
+      - name: Render upstream charts of all Applications
+        run: |
+          yq -r -N '
+            .spec.destination.namespace as $ns
+            | .spec.sources[]?
+            | select(.chart and .repoURL != "ghcr.io/mescoczubinski/charts")
+            | [.helm.releaseName, .chart, .repoURL, .targetRevision, $ns, (.helm.valueFiles[0] // "")]
+            | @tsv
+          ' infra/argocd/applications/*.yaml | grep . | while read -r release chart repo version ns values; do
+            values=${values#\$values/}
+            helm template "$release" "$chart" --repo "$repo" --version "$version" -n "$ns" --kube-version "$KUBERNETES_VERSION" ${values:+-f "$values"}
+          done > rendered.yaml
+      - name: Scan upstream images
+        run: |
+          yq -r -N '.. | select(tag == "!!map" and has("image")) | .image | select(tag == "!!str")' rendered.yaml $(git ls-files 'tools/*.yaml' 'infra/*.yaml' | grep -v values.yaml) | sort -u > images.txt
+          [ -s images.txt ]
+          status=0
+          while read -r image; do
+            trivy image --scanners vuln --severity CRITICAL --ignore-unfixed --exit-code 1 --timeout 20m --no-progress "$image" || status=1
+          done < images.txt
+          exit "$status"
