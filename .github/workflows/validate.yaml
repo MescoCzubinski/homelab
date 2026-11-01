@@ -1,8 +1,7 @@
-name: ci
+name: validate
 
 on:
   push:
-  pull_request:
 
 permissions:
   contents: read
@@ -19,21 +18,22 @@ jobs:
         run: |
           curl -sSL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" | tar -xz kubeconform
           sudo mv kubeconform /usr/local/bin/
-      - name: Render Helm charts of all Applications
+      - name: Check charts/app version bump
         run: |
-          local_version=$(yq -r .version charts/app/Chart.yaml)
-          for app in infra/argocd/applications/*.yaml; do
-            yq -r '. as $a | (.spec.sources // [.spec.source])[] | select(has("helm")) | [$a.metadata.name, .helm.releaseName // $a.metadata.name, $a.spec.destination.namespace, .chart, .repoURL, .targetRevision, ((.helm.valueFiles // []) | map(sub("^\\$values/"; "")) | join(" -f ") | select(. != "") // "-")] | @tsv' "$app"
-          done | grep . | while IFS=$'\t' read -r name release ns chart repo rev values; do
-            args=(--kube-version "$KUBERNETES_VERSION" -n "$ns")
-            [ "$values" != "-" ] && args+=(-f $values)
-            if [[ "$repo" == *://* ]]; then
-              helm template "$release" "$chart" --repo "$repo" --version "$rev" "${args[@]}"
-            elif ! helm template "$release" "oci://$repo/$chart" --version "$rev" "${args[@]}"; then
-              [ "$repo/$chart" = "ghcr.io/mescoczubinski/charts/app" ] && [ "$rev" = "$local_version" ] || exit 1
-              echo "::warning::app $rev is not on GHCR yet, $name rendered from charts/app" >&2
-              helm template "$release" charts/app "${args[@]}"
-            fi
+          version=$(yq -r .version charts/app/Chart.yaml)
+          helm pull oci://ghcr.io/mescoczubinski/charts/app --version "$version" --untar --untardir "$RUNNER_TEMP" || { echo "app $version is not on GHCR yet"; exit 0; }
+          diff -r "$RUNNER_TEMP/app" charts/app || { echo "::error::charts/app changed, but app $version is already on GHCR. Bump version in charts/app/Chart.yaml"; exit 1; }
+      - name: Render upstream charts of all Applications
+        run: |
+          yq -r -N '
+            .spec.destination.namespace as $ns
+            | .spec.sources[]?
+            | select(.chart and .repoURL != "ghcr.io/mescoczubinski/charts")
+            | [.helm.releaseName, .chart, .repoURL, .targetRevision, $ns, (.helm.valueFiles[0] // "")]
+            | @tsv
+          ' infra/argocd/applications/*.yaml | grep . | while read -r release chart repo version ns values; do
+            values=${values#\$values/}
+            helm template "$release" "$chart" --repo "$repo" --version "$version" -n "$ns" --kube-version "$KUBERNETES_VERSION" ${values:+-f "$values"}
           done > rendered.yaml
       - name: Render charts/app with the values of every app
         run: |
@@ -46,3 +46,5 @@ jobs:
         run: kubeconform -strict -summary -ignore-missing-schemas -kubernetes-version "$KUBERNETES_VERSION" -skip SealedSecret < rendered.yaml
       - name: Validate plain manifests
         run: kubeconform -strict -summary -ignore-missing-schemas -kubernetes-version "$KUBERNETES_VERSION" -skip SealedSecret -ignore-filename-pattern 'values.yaml' -ignore-filename-pattern 'k0sctl.yaml' tools infra
+      - name: Parse YAML that kubeconform skips
+        run: yq -e true cluster/k0sctl.yaml apps/*/sealed-secret.yaml > /dev/null
