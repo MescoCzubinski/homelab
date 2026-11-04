@@ -1,5 +1,4 @@
 {{- range .Values.components }}
-{{- $ctx := dict "root" $ "component" . }}
 ---
 apiVersion: v1
 kind: Service
@@ -7,10 +6,14 @@ metadata:
   name: {{ .name }}
   namespace: {{ $.Release.Namespace }}
   labels:
-    {{- include "app.labels" $ctx | nindent 4 }}
+    app.kubernetes.io/name: {{ .name }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/version: {{ .image.tag | quote }}
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
 spec:
   selector:
-    {{- include "app.selectorLabels" $ctx | nindent 4 }}
+    app.kubernetes.io/name: {{ .name }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
   ports:
     - name: http
       port: {{ .port }}

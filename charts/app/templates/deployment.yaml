@@ -1,5 +1,4 @@
 {{- range .Values.components }}
-{{- $ctx := dict "root" $ "component" . }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -7,17 +6,24 @@ metadata:
   name: {{ .name }}
   namespace: {{ $.Release.Namespace }}
   labels:
-    {{- include "app.labels" $ctx | nindent 4 }}
+    app.kubernetes.io/name: {{ .name }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/version: {{ .image.tag | quote }}
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
 spec:
   replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      {{- include "app.selectorLabels" $ctx | nindent 6 }}
+      app.kubernetes.io/name: {{ .name }}
+      app.kubernetes.io/instance: {{ $.Release.Name }}
   template:
     metadata:
       labels:
-        {{- include "app.labels" $ctx | nindent 8 }}
+        app.kubernetes.io/name: {{ .name }}
+        app.kubernetes.io/instance: {{ $.Release.Name }}
+        app.kubernetes.io/version: {{ .image.tag | quote }}
+        app.kubernetes.io/managed-by: {{ $.Release.Service }}
     spec:
       {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:
