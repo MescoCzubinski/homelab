@@ -49,6 +49,8 @@ spec:
         - name: proc
           hostPath:
             path: /proc
+            type: Directory
         - name: sys
           hostPath:
             path: /sys
+            type: Directory

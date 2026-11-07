@@ -24,6 +24,7 @@ extraVolumeMounts:
   - name: data
     mountPath: /data
     hostPath: /home/server/gatus/data
+    hostPathType: Directory
 
 config:
   storage:
