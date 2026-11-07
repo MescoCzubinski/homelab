@@ -39,7 +39,7 @@ config:
     - name: Homepage
       group: apps
       url: "https://czubinski.dev/"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[STATUS] == 200"
       alerts:
@@ -47,7 +47,7 @@ config:
     - name: Meetly frontend
       group: apps
       url: "https://meetly.czubinski.dev/"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[STATUS] == 200"
       alerts:
@@ -55,7 +55,7 @@ config:
     - name: Meetly backend
       group: apps
       url: "https://meetly.czubinski.dev/api/health"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[STATUS] == 200"
       alerts:
@@ -63,7 +63,7 @@ config:
     - name: Atlas frontend
       group: apps
       url: "https://atlas.czubinski.dev/"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[STATUS] == 200"
       alerts:
@@ -71,7 +71,7 @@ config:
     - name: Atlas backend
       group: apps
       url: "https://atlas.czubinski.dev/api/health"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[STATUS] == 200"
       alerts:
@@ -79,7 +79,7 @@ config:
     - name: Traefik
       group: infra
       url: "tcp://traefik.traefik.svc.cluster.local:443"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[CONNECTED] == true"
       alerts:
@@ -87,7 +87,7 @@ config:
     - name: ArgoCD
       group: tools
       url: "http://argocd-server.argocd.svc.cluster.local/healthz"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[STATUS] == 200"
       alerts:
@@ -95,7 +95,7 @@ config:
     - name: Beszel
       group: tools
       url: "http://beszel-hub.beszel.svc.cluster.local:8090/"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[STATUS] == 200"
       alerts:
@@ -103,7 +103,7 @@ config:
     - name: ConvertX
       group: tools
       url: "http://convertx.convertx.svc.cluster.local:3000/"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[STATUS] == 200"
       alerts:
@@ -111,7 +111,7 @@ config:
     - name: Stirling PDF
       group: tools
       url: "http://stirling.stirling.svc.cluster.local:8080/"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[STATUS] == 200"
       alerts:
@@ -119,7 +119,7 @@ config:
     - name: Syncthing
       group: tools
       url: "tcp://syncthing.syncthing.svc.cluster.local:8384"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[CONNECTED] == true"
       alerts:
@@ -127,7 +127,7 @@ config:
     - name: Samba
       group: tools
       url: "tcp://samba.samba.svc.cluster.local:445"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[CONNECTED] == true"
       alerts:
@@ -135,7 +135,7 @@ config:
     - name: Syncthing sync
       group: tools
       url: "tcp://syncthing.syncthing.svc.cluster.local:22000"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[CONNECTED] == true"
       alerts:
