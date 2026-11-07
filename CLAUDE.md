@@ -71,6 +71,8 @@ A new tool comes with all of these:
 
 A `charts/app` change bumps `Chart.yaml` `version` and must render with the values of atlas, homepage and meetly.
 
+`.coderabbit.yaml` and `REVIEW.md` (Claude Code Review) hold the same review rules. A change to one goes into the other in the same commit.
+
 ### Security
 
 Make every change as secure as the component allows, especially in `tools/`. Flag anything that grows the attack surface or blast radius:
@@ -101,7 +103,7 @@ Messages are lowercase, with no trailing period. `{name}` is the app or director
 - **Init, own app:** `{name} v0.0.1: init`, e.g. `atlas v0.0.1: init`. Own apps (atlas, homepage, meetly) always start at `v0.0.1`
 - **Init, no version:** `{name}: init`, e.g. `namespaces: init`. For plain resources without a version
 - **Several tools:** `tools: {changes}`, e.g. `tools: recreate strategy`. For a change to the `tools/` directory as a whole (sometimes cloudflared). A change to one tool uses that tool's name
-- **CI, Renovate, CodeRabbit:** `ci: {changes}`, e.g. `ci: renovate commit format`
+- **CI, Renovate, CodeRabbit, `REVIEW.md`:** `ci: {changes}`, e.g. `ci: renovate commit format`
 - **Docs:** `docs: {changes}`, e.g. `docs: commit conventions`
 
 `charts/app` commits use `helm` as `{name}`, e.g. `helm v0.2.0: postgres per app`.
