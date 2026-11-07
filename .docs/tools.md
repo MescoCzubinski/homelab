@@ -8,6 +8,7 @@ Dashed `svc` boxes are config only: Traefik reads pod IPs from them and connects
 
 ## Addresses and data
 
+- **Basic Memory:** MCP server at `memory.czubinski.dev/mcp`, notes in `/home/server/basic-memory/data`, SQLite index and embedding model in `/home/server/basic-memory/config`
 - **Beszel:** server monitoring at `beszel.czubinski.dev`, data in `/home/server/beszel/hub-data`
 - **ConvertX:** file conversion at `convert.czubinski.dev`, data in `/home/server/convertx/data`
 - **Gatus:** uptime checks and status page at `gatus.czubinski.dev`, data in `/home/server/gatus/data` (SQLite)
