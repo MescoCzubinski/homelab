@@ -24,14 +24,24 @@ extraVolumeMounts:
   - name: data
     mountPath: /data
     hostPath: /home/server/gatus/data
+    hostPathType: Directory
 
 config:
   storage:
     type: sqlite
     path: /data/data.db
   alerting:
-    discord:
-      webhook-url: "${DISCORD_WEBHOOK_URL}"
+    custom:
+      url: "${DISCORD_WEBHOOK_URL}"
+      method: POST
+      headers:
+        Content-Type: application/json
+      body: |
+        {"embeds": [{"title": "[ENDPOINT_NAME]: [ALERT_TRIGGERED_OR_RESOLVED], "url": "https://gatus.czubinski.dev"}]}
+      placeholders:
+        ALERT_TRIGGERED_OR_RESOLVED:
+          TRIGGERED: 'down", "color": 15158332'
+          RESOLVED: 'up", "color": 3066993'
       default-alert:
         failure-threshold: 2
         send-on-resolved: true
@@ -39,104 +49,112 @@ config:
     - name: Homepage
       group: apps
       url: "https://czubinski.dev/"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[STATUS] == 200"
       alerts:
-        - type: discord
+        - type: custom
     - name: Meetly frontend
       group: apps
       url: "https://meetly.czubinski.dev/"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[STATUS] == 200"
       alerts:
-        - type: discord
+        - type: custom
     - name: Meetly backend
       group: apps
       url: "https://meetly.czubinski.dev/api/health"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[STATUS] == 200"
       alerts:
-        - type: discord
+        - type: custom
     - name: Atlas frontend
       group: apps
       url: "https://atlas.czubinski.dev/"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[STATUS] == 200"
       alerts:
-        - type: discord
+        - type: custom
     - name: Atlas backend
       group: apps
       url: "https://atlas.czubinski.dev/api/health"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[STATUS] == 200"
       alerts:
-        - type: discord
+        - type: custom
     - name: Traefik
       group: infra
       url: "tcp://traefik.traefik.svc.cluster.local:443"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[CONNECTED] == true"
       alerts:
-        - type: discord
+        - type: custom
     - name: ArgoCD
       group: tools
       url: "http://argocd-server.argocd.svc.cluster.local/healthz"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[STATUS] == 200"
       alerts:
-        - type: discord
+        - type: custom
+    - name: Basic Memory
+      group: tools
+      url: "tcp://basic-memory.basic-memory.svc.cluster.local:8000"
+      interval: 1m
+      conditions:
+        - "[CONNECTED] == true"
+      alerts:
+        - type: custom
     - name: Beszel
       group: tools
       url: "http://beszel-hub.beszel.svc.cluster.local:8090/"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[STATUS] == 200"
       alerts:
-        - type: discord
+        - type: custom
     - name: ConvertX
       group: tools
       url: "http://convertx.convertx.svc.cluster.local:3000/"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[STATUS] == 200"
       alerts:
-        - type: discord
+        - type: custom
     - name: Stirling PDF
       group: tools
       url: "http://stirling.stirling.svc.cluster.local:8080/"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[STATUS] == 200"
       alerts:
-        - type: discord
+        - type: custom
     - name: Syncthing
       group: tools
       url: "tcp://syncthing.syncthing.svc.cluster.local:8384"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[CONNECTED] == true"
       alerts:
-        - type: discord
+        - type: custom
     - name: Samba
       group: tools
       url: "tcp://samba.samba.svc.cluster.local:445"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[CONNECTED] == true"
       alerts:
-        - type: discord
+        - type: custom
     - name: Syncthing sync
       group: tools
       url: "tcp://syncthing.syncthing.svc.cluster.local:22000"
-      interval: 5m
+      interval: 1m
       conditions:
         - "[CONNECTED] == true"
       alerts:
-        - type: discord
+        - type: custom

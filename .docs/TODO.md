@@ -24,7 +24,7 @@
 - [x] Container hardening — non-root, read-only fs, seccomp
 - [x] Pod Security labels — enforced per namespace
 - [x] Renovate — tracks pinned versions beyond Image Updater
-- [x] CI — Renovate and CodeRabbit configuration files
+- [x] CI — Renovate, CodeRabbit and Claude Code Review configuration files
 - [x] Dedicated VIP and DNS for API (`k8s.czubinski.dev`)
 - [x] kube-vip — control plane VIP with k0sctl config
 - [x] Helm charts for tools — upstream where they exist
@@ -50,6 +50,7 @@
 - [x] Homepage
 - [x] Meetly
 - [x] Atlas
+- [x] Basic Memory
 - [ ] RustDesk
 - [ ] Sonarr, Radarr, Lidarr
 - [ ] AFFiNE

@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: basic-memory
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:MescoCzubinski/homelab.git
+    targetRevision: main
+    path: tools/basic-memory
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: basic-memory
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    managedNamespaceMetadata:
+      labels:
+        pod-security.kubernetes.io/warn: restricted
+        pod-security.kubernetes.io/audit: restricted

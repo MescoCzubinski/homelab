@@ -37,6 +37,7 @@ infra/
   traefik/               Traefik, middlewares
 scripts/                 helper scripts, on PATH through flake.nix
 tools/                   private tools
+  basic-memory/
   beszel/
   convertx/
   gatus/
@@ -60,6 +61,7 @@ Each private tool in `tools/` has its own Application: a plain directory of mani
 ### Private
 
 - [Argo CD](https://argoproj.github.io/cd/) - GitOps controller
+- [Basic Memory](https://github.com/basicmachines-co/basic-memory) - knowledge base for AI assistants (MCP)
 - [Beszel](https://beszel.dev) - server monitoring
 - [ConvertX](https://github.com/C4illin/ConvertX) - file converter
 - [Gatus](https://gatus.io) - status page and health checks
