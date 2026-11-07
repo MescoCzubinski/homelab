@@ -93,6 +93,14 @@ config:
         - "[STATUS] == 200"
       alerts:
         - type: discord
+    - name: Basic Memory
+      group: tools
+      url: "tcp://basic-memory.basic-memory.svc.cluster.local:8000"
+      interval: 1m
+      conditions:
+        - "[CONNECTED] == true"
+      alerts:
+        - type: discord
     - name: Beszel
       group: tools
       url: "http://beszel-hub.beszel.svc.cluster.local:8090/"

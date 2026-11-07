@@ -50,6 +50,7 @@
 - [x] Homepage
 - [x] Meetly
 - [x] Atlas
+- [x] Basic Memory
 - [ ] RustDesk
 - [ ] Sonarr, Radarr, Lidarr
 - [ ] AFFiNE

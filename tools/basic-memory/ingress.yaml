@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: basic-memory
+  namespace: basic-memory
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: default-http-vpn-only@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: memory.czubinski.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: basic-memory
+                port:
+                  number: 8000
