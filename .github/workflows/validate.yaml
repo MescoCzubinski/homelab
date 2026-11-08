@@ -45,6 +45,6 @@ jobs:
       - name: Validate rendered charts
         run: kubeconform -strict -summary -ignore-missing-schemas -kubernetes-version "$KUBERNETES_VERSION" -skip SealedSecret < rendered.yaml
       - name: Validate plain manifests
-        run: kubeconform -strict -summary -ignore-missing-schemas -kubernetes-version "$KUBERNETES_VERSION" -skip SealedSecret -ignore-filename-pattern 'values.yaml' -ignore-filename-pattern 'k0sctl.yaml' tools infra
+        run: kubeconform -strict -summary -ignore-missing-schemas -kubernetes-version "$KUBERNETES_VERSION" -skip SealedSecret -ignore-filename-pattern 'values.yaml' -ignore-filename-pattern 'k0sctl.yaml' tools infra cluster
       - name: Parse YAML that kubeconform skips
         run: yq -e true cluster/k0sctl.yaml apps/*/sealed-secret.yaml > /dev/null

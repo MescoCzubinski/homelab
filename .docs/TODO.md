@@ -25,7 +25,7 @@
 - [x] Pod Security labels — enforced per namespace
 - [x] Renovate — tracks pinned versions beyond Image Updater
 - [x] CI — Renovate, CodeRabbit and Claude Code Review configuration files
-- [x] Dedicated VIP and DNS for API (`k8s.czubinski.dev`)
+- [x] Dedicated VIP and DNS for API (`k0s.czubinski.dev`)
 - [x] kube-vip — control plane VIP with k0sctl config
 - [x] Helm charts for tools — upstream where they exist
 - [x] Gatus — status page and uptime checks for everything
@@ -33,7 +33,7 @@
 - [x] Postgres per app — independent CNPG cluster for each app
 - [x] Discord webhooks — alerts from Gatus and Argo CD
 - [x] CI security — weekly Trivy CVE scan, Gitleaks on push to main, push protection
-- [ ] API and etcd via VIP — move both onto the existing VIP
+- [x] API via VIP — kube-vip static pod, etcd stays on node IP
 - [ ] Terraform — OpenTofu state and CI
 - [ ] Cloudflare config in repo — DNS and tunnels (OpenTofu)
 - [ ] Error pages — styled 502, 503 and 504 via Traefik, 5XX and tunnel errors via Cloudflare

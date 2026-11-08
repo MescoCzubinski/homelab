@@ -26,13 +26,12 @@ apps/                    public apps
   meetly/
 charts/
   app/                   Helm chart for apps
-cluster/                 k0s config
+cluster/                 k0s config, static pods
 infra/
   argocd/                Argo CD, Applications
   argocd-image-updater/  Image Updater
   cloudflared/           Cloudflare Tunnel
   cnpg/                  CloudNativePG, database storage
-  kube-vip/              API server VIP
   sealed-secrets/        Sealed Secrets
   traefik/               Traefik, middlewares
 scripts/                 helper scripts, on PATH through flake.nix
