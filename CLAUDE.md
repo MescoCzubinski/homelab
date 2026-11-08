@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-GitOps repo for a single-node k0s cluster on a Mac Mini (node `myserver.home`, LAN IP `192.168.1.100`, VPN IP `192.168.0.1`). Argo CD applies everything in `infra/`, `apps/` and `tools/` from `main`. Nothing gets `kubectl apply`'d by hand, and `selfHeal` reverts manual changes. The README and `.docs/` explain the design. Read the relevant doc before you change a subsystem.
+GitOps repo for a single-node k0s cluster on a Mac Mini (node `myserver.home`, LAN IP `192.168.1.100`, VPN IP `192.168.0.1`, API VIP `192.168.1.101` as `k0s.czubinski.dev`). Argo CD applies everything in `infra/`, `apps/` and `tools/` from `main`. Nothing gets `kubectl apply`'d by hand, and `selfHeal` reverts manual changes. The README and `.docs/` explain the design. Read the relevant doc before you change a subsystem.
 
 ## Commands
 
@@ -15,7 +15,7 @@ helm template atlas charts/app -n atlas -f apps/atlas/values.yaml
 
 # plain manifests (CI uses Kubernetes 1.36.2)
 kubeconform -strict -summary -ignore-missing-schemas -kubernetes-version 1.36.2 -skip SealedSecret \
-  -ignore-filename-pattern 'values.yaml' -ignore-filename-pattern 'k0sctl.yaml' tools infra
+  -ignore-filename-pattern 'values.yaml' -ignore-filename-pattern 'k0sctl.yaml' tools infra cluster
 ```
 
 Seal a secret with `scripts/create-secret.sh`, on `PATH` through `flake.nix` (direnv or `nix develop`). It creates or updates the namespace's `sealed-secret.yaml`. Leave out `value` for a hidden prompt, so the plaintext stays out of shell history. A new file deploys only if its Application's `directory.include` lists it.
@@ -79,7 +79,7 @@ Make every change as secure as the component allows, especially in `tools/`. Fla
 
 - Ingress always names its entrypoint. `public` only for public apps, everything else VPN-only through the middlewares above.
 - Pods: `runAsNonRoot`, `allowPrivilegeEscalation: false`, `capabilities.drop: [ALL]`, `seccompProfile: RuntimeDefault`, `readOnlyRootFilesystem: true` with `emptyDir` for writable paths where the image allows it, requests and limits.
-- `hostNetwork`, `hostPath` outside `/home/server/`, `hostPort`, `privileged` or added capabilities need a stated reason (current ones: beszel agent `hostNetwork`, samba running as root with added capabilities, Traefik `hostPort`s).
+- `hostNetwork`, `hostPath` outside `/home/server/`, `hostPort`, `privileged` or added capabilities need a stated reason (current ones: beszel agent `hostNetwork`, samba running as root with added capabilities, Traefik `hostPort`s, kube-vip static pod with `hostNetwork`, root, `NET_ADMIN`/`NET_RAW` and the admin kubeconfig).
 - Secrets only as SealedSecrets, never in `values.yaml`, `env` or plain Secrets.
 - Images and charts pinned to a version, never `latest`.
 - NetworkPolicies no wider (sources, destinations, ports) than needed.

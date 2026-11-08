@@ -11,6 +11,11 @@ spec:
         address: 192.168.0.1
         user: server
         port: 22
+      files:
+        - name: kube-vip
+          src: kube-vip.yaml
+          dstDir: /etc/k0s/static-pods
+          perm: 0600
   k0s:
     version: v1.36.2+k0s.0
     config:
@@ -22,8 +27,9 @@ spec:
       spec:
         api:
           address: 192.168.1.100
+          externalAddress: 192.168.1.101
           sans:
-            - k8s.czubinski.dev
+            - k0s.czubinski.dev
           ca:
             certificatesExpireAfter: 8760h0m0s
             expiresAfter: 87600h0m0s
@@ -89,6 +95,8 @@ spec:
         workerProfiles:
           - name: single
             values:
+              staticPodPath: /etc/k0s/static-pods
+
               imageMaximumGCAge: 96h
               imageGCHighThresholdPercent: 70
               imageGCLowThresholdPercent: 60

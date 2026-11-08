@@ -28,6 +28,6 @@ NetworkPolicies from `charts/app` for the `<app>-pg` pods, only when `postgres: 
 | -------------------- | ----------------------------------------------------------- |
 | `cnpg-to-<app>`      | `cnpg-system` to the database on `5432` and `8000` (status) |
 | `<app>-to-<app>`     | the app's own pods to the database on `5432`                |
-| `<app>-to-apiserver` | the database to the API server (`192.168.1.100:6443`)       |
+| `<app>-to-apiserver` | the database to the API server (`192.168.1.101:6443`)       |
 
 The database pods are left out of `traefik-to-<app>` and `<app>-to-internet`, so only the app's pods (on `5432`) and `cnpg-system` reach them, and they reach only DNS (`<app>-to-dns`) and the API server.

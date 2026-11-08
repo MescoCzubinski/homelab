@@ -36,6 +36,12 @@ Server (firewalld):
 
 `443`, `445` and `22000` are Traefik entrypoints, `6443` is the Kubernetes API (kubectl over VPN).
 
+## API VIP
+
+The API is reached through the VIP `192.168.1.101` (`k0s.czubinski.dev`), not the node IP. kube-vip announces it over ARP on `enp1s0f0`. It runs as a static pod from `cluster/kube-vip.yaml`, so the VIP is up before Argo CD, and it talks to the API on `localhost:6443`. `externalAddress` points kubelet, kube-router and the in-cluster `kubernetes` Service at the VIP. etcd stays on the node IP `192.168.1.100`.
+
+The VIP is a LAN address, so `6443` on it is still closed on `enp1s0f0` and open only from `wg0`. VPN clients need `192.168.1.101/32` in `AllowedIPs`.
+
 ## NetworkPolicies
 
 Traffic inside the cluster is closed by default and opened one path at a time. Every app, tool and infra namespace is default-deny for incoming traffic, and each policy allows one source to reach one destination. A compromised pod therefore can't reach its neighbours.
