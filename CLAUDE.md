@@ -6,7 +6,7 @@ GitOps repo for a single-node k0s cluster on a Mac Mini (node `myserver.home`, L
 
 ## Commands
 
-No build. CI (`.github/workflows/validate.yaml`) renders every Helm-based Application and validates the output with kubeconform. It fails if `charts/app` differs from the chart published on GHCR under the same version. `.github/workflows/trivy.yaml` scans upstream images daily and lists every CRITICAL CVE that has a fix in one issue, label `vulnerabilities`, closed when the list is empty (`apps/` images are skipped, their tags aren't in git). `.github/workflows/gitleaks.yaml` scans the git history on every push to `main`, `.gitleaks.toml` allows SealedSecret ciphertext. To check locally:
+No build. CI (`.github/workflows/validate.yaml`) renders every Helm-based Application and validates the output with kubeconform. It fails if `charts/app` differs from the chart published on GHCR under the same version. `.github/workflows/trivy.yaml` scans upstream images daily and lists every CRITICAL CVE that has a fix in one issue, label `vulnerabilities`, closed when the list is empty (`apps/` images are skipped, their tags aren't in git). `.github/workflows/gitleaks.yaml` scans the git history on every push to `main`, `.gitleaks.toml` allows SealedSecret ciphertext. `.github/workflows/claude.yaml` answers `@claude` on PRs (Sonnet, may push obvious fixes), `.github/workflows/claude-review.yaml` reviews every push to a non-draft PR against `REVIEW.md` (Sonnet, comments only, skips Renovate and `.md`-only changes). `.github/workflows/claude-renovate.yaml` checks Renovate PRs for breaking changes and fails when one needs an edit or a manual step. To check locally:
 
 ```sh
 # charts/app with one app's values (repeat for atlas, homepage, meetly)

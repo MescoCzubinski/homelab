@@ -1,0 +1,45 @@
+name: claude-review
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+    paths-ignore:
+      - '**.md'
+
+permissions:
+  contents: read
+  pull-requests: read
+  id-token: write
+
+jobs:
+  review:
+    if: ${{ !github.event.pull_request.draft && github.event.pull_request.user.login != 'renovate[bot]' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: claude-review-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: anthropics/claude-code-action@61a9c274fa7110a66dfafc1bbbced03833eb25fe # v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          track_progress: true
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+            BEFORE: ${{ github.event.before }}
+            HEAD: ${{ github.event.pull_request.head.sha }}
+
+            Review this pull request against the rules in REVIEW.md and CLAUDE.md.
+            If BEFORE is set and `git cat-file -e BEFORE` succeeds, review only `git diff BEFORE HEAD`, the commits pushed since the last review. Otherwise review the whole `gh pr diff`.
+            Put the whole review in your progress comment as one summary, with no inline comments. Start with a one-line verdict, then list each problem with a link to the lines it is about (https://github.com/${{ github.repository }}/blob/<HEAD sha>/<path>#L<from>-L<to>). Don't repeat a problem an earlier review already reported.
+            Keep it short, like CodeRabbit: one or two sentences per problem that say what is wrong and why, plus the fix if it fits in a line. No greeting, recap or praise.
+            Only review. Don't edit files, commit or push.
+          claude_args: |
+            --model sonnet
+            --allowedTools "Bash(gh pr diff:*),Bash(gh pr view:*),Bash(git diff:*),Bash(git log:*),Bash(git cat-file:*)"
+            --disallowedTools "Edit,Write,MultiEdit,NotebookEdit,Bash(git commit:*),Bash(git push:*)"
