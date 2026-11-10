@@ -55,5 +55,5 @@ Renovate covers what the Image Updater doesn't, and opens pull requests instead 
 
 - **Major:** pull request any time
 - **Minor:** pull request only on the 1st of the month, so a package gets at most one a month
-- **Patch:** pull request any time for `argo-cd`, `traefik` and `cloudflared`, skipped for the rest.
+- **Patch:** one grouped pull request on Monday morning, after the Trivy scan. `argo-cd`, `traefik` and `cloudflared` get theirs any time
 - **Release age:** a version must be at least 3 days old

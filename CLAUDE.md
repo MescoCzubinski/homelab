@@ -47,7 +47,7 @@ The labels are set through the Application's `managedNamespaceMetadata`. Tools k
 **Updates.** Two separate paths, which must not overlap:
 
 - `apps/`: Argo CD Image Updater moves image tags to the newest `vX.Y.Z` on GHCR and writes them to the Application as `helm.parameters`, not to git. `tag: v0.0.1` in `values.yaml` is only a baseline, and Renovate is disabled for `apps/**`.
-- Everything else: Renovate PRs (majors any time, minors and action digests on the 1st of the month, patches only for `argo-cd`, `traefik` and `cloudflared`, 3-day minimum release age). `renovate.json` rewrites commit messages to follow the commit conventions below. If a new package's name doesn't match its directory/Application name, add a `commitMessageTopic` packageRule.
+- Everything else: Renovate PRs (majors any time, minors and action digests on the 1st of the month, patches in one grouped PR on Monday morning, except `argo-cd`, `traefik` and `cloudflared`, which get theirs any time, 3-day minimum release age). `renovate.json` rewrites commit messages to follow the commit conventions below. If a new package's name doesn't match its directory/Application name, add a `commitMessageTopic` packageRule.
 
 **Postgres.** `postgres: true` in an app's values creates a CNPG `Cluster` `<app>-pg` (credentials in the generated `<app>-pg-app` secret, used via `secretEnv`) and its NetworkPolicies. It also needs a static PV in `infra/cnpg/persistentvolumes.yaml` (`claimRef` `<app>/<app>-pg-1`, path `/home/server/postgres/<app>` created by hand on the host) and `sync-wave: "1"` on the Application. Details: `.docs/database.md`.
 
@@ -103,6 +103,7 @@ Messages are lowercase, with no trailing period. `{name}` is the app or director
 - **Init, own app:** `{name} v0.0.1: init`, e.g. `atlas v0.0.1: init`. Own apps (atlas, homepage, meetly) always start at `v0.0.1`
 - **Init, no version:** `{name}: init`, e.g. `namespaces: init`. For plain resources without a version
 - **Several tools:** `tools: {changes}`, e.g. `tools: recreate strategy`. For a change to the `tools/` directory as a whole (sometimes cloudflared). A change to one tool uses that tool's name
+- **Weekly patches (Renovate group):** `patches: {names}`, e.g. `patches: samba, syncthing`. Package names as in the image or chart, without registry
 - **CI, Renovate, CodeRabbit, `REVIEW.md`:** `ci: {changes}`, e.g. `ci: renovate commit format`
 - **Docs:** `docs: {changes}`, e.g. `docs: commit conventions`
 

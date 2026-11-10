@@ -6,6 +6,7 @@
   "prHourlyLimit": 2,
   "dependencyDashboardApproval": false,
   "minimumReleaseAge": "3 days",
+  "separateMinorPatch": true,
   "rebaseWhen": "conflicted",
   "kubernetes": {
     "managerFilePatterns": [
@@ -66,20 +67,17 @@
       "commitMessageExtra": "{{{newVersion}}}"
     },
     {
-      "description": "Skip patch bumps",
+      "description": "Patch bumps in one PR on Monday morning, after the Trivy scan; the most exposed components (argo-cd, traefik, cloudflared) get theirs any time. Title lists the packages (\"patches: samba, syncthing\"); groupName stays fixed so the branch does too. groupSingleUpdates keeps that title for a lone patch. prTitleStrict drops the \" (patch)\" suffix Renovate adds to groups",
+      "matchPackageNames": ["!argo-cd", "!traefik", "!cloudflare/cloudflared"],
       "matchUpdateTypes": ["patch"],
-      "enabled": false
-    },
-    {
-      "description": "Most exposed components: keep a patch separate from a pending minor",
-      "matchPackageNames": ["argo-cd", "traefik", "cloudflare/cloudflared"],
-      "separateMinorPatch": true
-    },
-    {
-      "description": "Most exposed components: patch bumps any time",
-      "matchPackageNames": ["argo-cd", "traefik", "cloudflare/cloudflared"],
-      "matchUpdateTypes": ["patch"],
-      "enabled": true
+      "groupName": "patches",
+      "groupSingleUpdates": true,
+      "group": {
+        "commitMessageTopic": "patches: {{#each (distinct (lookupArray upgrades \"depName\"))}}{{{replace \"^.*/\" \"\" this}}}{{#unless @last}}, {{/unless}}{{/each}}"
+      },
+      "schedule": ["* 9-11 * * 1"],
+      "commitMessageExtra": "",
+      "prTitleStrict": true
     },
     {
       "description": "Minor and digest bumps once a month, majors any time",
