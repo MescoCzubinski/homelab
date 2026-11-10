@@ -18,7 +18,7 @@ kubeconform -strict -summary -ignore-missing-schemas -kubernetes-version 1.36.2 
   -ignore-filename-pattern 'values.yaml' -ignore-filename-pattern 'k0sctl.yaml' tools infra cluster
 ```
 
-Seal a secret with `scripts/create-secret.sh`, on `PATH` through `flake.nix` (direnv or `nix develop`). It creates or updates the namespace's `sealed-secret.yaml`. Leave out `value` for a hidden prompt, so the plaintext stays out of shell history. A new file deploys only if its Application's `directory.include` lists it.
+Seal a secret with `scripts/create-secret.sh`, on `PATH` through `flake.nix` (direnv or `nix develop`), together with `kubectl`, `kubeseal`, `helm`, `kubeconform`, `k0sctl` and `openssl`. It creates or updates the namespace's `sealed-secret.yaml`. Leave out `value` for a hidden prompt, so the plaintext stays out of shell history. A new file deploys only if its Application's `directory.include` lists it.
 
 ```sh
 create-secret.sh <namespace> <name> [key] [value]

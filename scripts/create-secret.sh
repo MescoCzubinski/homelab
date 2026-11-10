@@ -44,9 +44,19 @@ touch "$file"
 sealed=$(printf '%s' "$value" \
   | kubeseal --raw --cert "$root/infra/sealed-secrets/pub-cert.pem" --namespace "$namespace" --name "$name")
 
-export name key sealed
-if [ -n "$(yq 'select(.metadata.name == strenv(name)) | .metadata.name' "$file")" ]; then
-  yq -i '(select(.metadata.name == strenv(name)) | .spec.encryptedData[strenv(key)]) = strenv(sealed)' "$file"
+if grep -qxF "  name: $name" "$file"; then
+  export name key sealed
+  awk '
+    function put() { print "    " ENVIRON["key"] ": " ENVIRON["sealed"]; done = 1 }
+    /^---$/ { if (target && !done && inenc) put(); target = 0 }
+    $0 == "  name: " ENVIRON["name"] { target = 1 }
+    target && !done && inenc && !/^    / { put(); inenc = 0 }
+    target && !done && inenc && index($0, "    " ENVIRON["key"] ": ") == 1 { put(); next }
+    target && $0 == "  encryptedData:" { inenc = 1 }
+    { print }
+    END { if (target && !done && inenc) put() }
+  ' "$file" >"$file.tmp"
+  mv "$file.tmp" "$file"
 else
   cat >>"$file" <<EOF
 ---
