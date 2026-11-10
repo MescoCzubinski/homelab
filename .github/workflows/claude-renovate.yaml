@@ -1,0 +1,60 @@
+name: claude-renovate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+  id-token: write
+
+jobs:
+  check:
+    if: github.event.pull_request.user.login == 'renovate[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: claude-renovate-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - id: claude
+        uses: anthropics/claude-code-action@61a9c274fa7110a66dfafc1bbbced03833eb25fe # v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          allowed_bots: 'renovate[bot]'
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+            HEAD: ${{ github.event.pull_request.head.sha }}
+
+            This Renovate PR bumps a Helm chart, an image or a GitHub Action. Check whether the bump can break this cluster. Read CLAUDE.md first.
+            - Read the diff (`gh pr diff`) and the release notes in the PR body (`gh pr view`).
+            - Helm chart: compare `helm show values` and `helm show crds` of the old and new version (`--repo <url> --version <v>`, or the `oci://` reference). Flag keys this repo sets in its values.yaml that were renamed, removed or changed type (Helm ignores unknown keys silently), changed defaults this repo relies on and CRD changes. Skip render errors and new required values: the `validate` workflow renders every chart with this repo's values and checks the output with kubeconform.
+            - Image or action: look for breaking changes between the two versions in the release notes and the upgrade notes they link to.
+            Post your findings with `gh pr comment ${{ github.event.pull_request.number }} --edit-last --create-if-none`, so the PR keeps one comment that each run updates.
+            The comment is one summary: a one-line verdict, then each problem with a link to the lines of this repo it affects (https://github.com/${{ github.repository }}/blob/<HEAD sha>/<path>#L<from>-L<to>).
+            Keep it short, like CodeRabbit: one or two sentences per problem that say what changed and what it breaks here. Nothing found: only the verdict line. No greeting, recap or praise.
+            Set `breaking` to true only for a change that needs an edit in this repo or a manual step before merging.
+            Only check. Don't edit files, commit or push.
+          claude_args: |
+            --model sonnet
+            --allowedTools "Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*),Bash(helm show:*),WebFetch"
+            --disallowedTools "Edit,Write,MultiEdit,NotebookEdit,Bash(git commit:*),Bash(git push:*)"
+            --json-schema '{"type":"object","properties":{"breaking":{"type":"boolean"},"summary":{"type":"string"}},"required":["breaking","summary"]}'
+      - name: Fail on breaking change
+        env:
+          OUTPUT: ${{ steps.claude.outputs.structured_output }}
+        run: |
+          if [ -z "$OUTPUT" ]; then
+            echo "::error::Claude returned no structured output"
+            exit 1
+          fi
+          if jq -e .breaking <<< "$OUTPUT" > /dev/null; then
+            echo "::error::$(jq -r .summary <<< "$OUTPUT")"
+            exit 1
+          fi

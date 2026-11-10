@@ -6,7 +6,7 @@ GitOps repo for a single-node k0s cluster on a Mac Mini (node `myserver.home`, L
 
 ## Commands
 
-No build. CI (`.github/workflows/validate.yaml`) renders every Helm-based Application and validates the output with kubeconform. It fails if `charts/app` differs from the chart published on GHCR under the same version. `.github/workflows/trivy.yaml` scans upstream images every Monday and fails on a CRITICAL CVE that has a fix (`apps/` images are skipped, their tags aren't in git). `.github/workflows/gitleaks.yaml` scans the git history on every push to `main`, `.gitleaks.toml` allows SealedSecret ciphertext. To check locally:
+No build. CI (`.github/workflows/validate.yaml`) renders every Helm-based Application and validates the output with kubeconform. It fails if `charts/app` differs from the chart published on GHCR under the same version. `.github/workflows/trivy.yaml` scans upstream images daily and lists every CRITICAL CVE that has a fix in one issue, label `vulnerabilities`, closed when the list is empty (`apps/` images are skipped, their tags aren't in git). `.github/workflows/gitleaks.yaml` scans the git history on every push to `main`, `.gitleaks.toml` allows SealedSecret ciphertext. `.github/workflows/claude.yaml` answers `@claude` on PRs (Sonnet, may push obvious fixes), `.github/workflows/claude-review.yaml` reviews every push to a non-draft PR against `REVIEW.md` (Sonnet, comments only, skips Renovate and `.md`-only changes). `.github/workflows/claude-renovate.yaml` checks Renovate PRs for breaking changes and fails when one needs an edit or a manual step. To check locally:
 
 ```sh
 # charts/app with one app's values (repeat for atlas, homepage, meetly)
@@ -18,7 +18,7 @@ kubeconform -strict -summary -ignore-missing-schemas -kubernetes-version 1.36.2 
   -ignore-filename-pattern 'values.yaml' -ignore-filename-pattern 'k0sctl.yaml' tools infra cluster
 ```
 
-Seal a secret with `scripts/create-secret.sh`, on `PATH` through `flake.nix` (direnv or `nix develop`). It creates or updates the namespace's `sealed-secret.yaml`. Leave out `value` for a hidden prompt, so the plaintext stays out of shell history. A new file deploys only if its Application's `directory.include` lists it.
+Seal a secret with `scripts/create-secret.sh`, on `PATH` through `flake.nix` (direnv or `nix develop`), together with `kubectl`, `kubeseal`, `helm`, `kubeconform`, `k0sctl` and `openssl`. It creates or updates the namespace's `sealed-secret.yaml`. Leave out `value` for a hidden prompt, so the plaintext stays out of shell history. A new file deploys only if its Application's `directory.include` lists it.
 
 ```sh
 create-secret.sh <namespace> <name> [key] [value]
@@ -47,7 +47,7 @@ The labels are set through the Application's `managedNamespaceMetadata`. Tools k
 **Updates.** Two separate paths, which must not overlap:
 
 - `apps/`: Argo CD Image Updater moves image tags to the newest `vX.Y.Z` on GHCR and writes them to the Application as `helm.parameters`, not to git. `tag: v0.0.1` in `values.yaml` is only a baseline, and Renovate is disabled for `apps/**`.
-- Everything else: Renovate PRs (majors any time, minors and action digests on the 1st of the month, patches only for `argo-cd`, `traefik` and `cloudflared`, 3-day minimum release age). `renovate.json` rewrites commit messages to follow the commit conventions below. If a new package's name doesn't match its directory/Application name, add a `commitMessageTopic` packageRule.
+- Everything else: Renovate PRs (majors any time, minors and action digests on the 1st of the month, patches in one grouped PR on Monday morning, except `argo-cd`, `traefik` and `cloudflared`, which get theirs any time, 3-day minimum release age). `renovate.json` rewrites commit messages to follow the commit conventions below. If a new package's name doesn't match its directory/Application name, add a `commitMessageTopic` packageRule.
 
 **Postgres.** `postgres: true` in an app's values creates a CNPG `Cluster` `<app>-pg` (credentials in the generated `<app>-pg-app` secret, used via `secretEnv`) and its NetworkPolicies. It also needs a static PV in `infra/cnpg/persistentvolumes.yaml` (`claimRef` `<app>/<app>-pg-1`, path `/home/server/postgres/<app>` created by hand on the host) and `sync-wave: "1"` on the Application. Details: `.docs/database.md`.
 
@@ -103,6 +103,7 @@ Messages are lowercase, with no trailing period. `{name}` is the app or director
 - **Init, own app:** `{name} v0.0.1: init`, e.g. `atlas v0.0.1: init`. Own apps (atlas, homepage, meetly) always start at `v0.0.1`
 - **Init, no version:** `{name}: init`, e.g. `namespaces: init`. For plain resources without a version
 - **Several tools:** `tools: {changes}`, e.g. `tools: recreate strategy`. For a change to the `tools/` directory as a whole (sometimes cloudflared). A change to one tool uses that tool's name
+- **Weekly patches (Renovate group):** `patches: {names}`, e.g. `patches: samba, syncthing`. Package names as in the image or chart, without registry
 - **CI, Renovate, CodeRabbit, `REVIEW.md`:** `ci: {changes}`, e.g. `ci: renovate commit format`
 - **Docs:** `docs: {changes}`, e.g. `docs: commit conventions`
 

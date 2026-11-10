@@ -32,7 +32,7 @@
 - [x] Versioned app chart — OCI on GHCR, apps pin a version
 - [x] Postgres per app — independent CNPG cluster for each app
 - [x] Discord webhooks — alerts from Gatus and Argo CD
-- [x] CI security — weekly Trivy CVE scan, Gitleaks on push to main, push protection
+- [x] CI security — daily Trivy CVE scan with a dashboard issue, Gitleaks on push to main, push protection
 - [x] API via VIP — kube-vip static pod, etcd stays on node IP
 - [ ] Terraform — OpenTofu state and CI
 - [ ] Cloudflare config in repo — DNS and tunnels (OpenTofu)

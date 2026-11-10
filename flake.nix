@@ -11,8 +11,12 @@
     {
       devShells.x86_64-linux.default = pkgs.mkShell {
         packages = [
+          pkgs.kubectl
           pkgs.kubeseal
-          pkgs.yq-go
+          pkgs.kubernetes-helm
+          pkgs.kubeconform
+          pkgs.k0sctl
+          pkgs.openssl
         ];
         shellHook = ''
           export PATH="$(git rev-parse --show-toplevel)/scripts:$PATH"
