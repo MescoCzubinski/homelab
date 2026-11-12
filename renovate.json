@@ -67,22 +67,15 @@
       "commitMessageExtra": "{{{newVersion}}}"
     },
     {
-      "description": "Patch bumps in one PR on Monday morning, after the Trivy scan; the most exposed components (argo-cd, traefik, cloudflared) get theirs any time. Title lists the packages (\"patches: samba, syncthing\"); groupName stays fixed so the branch does too. groupSingleUpdates keeps that title for a lone patch. prTitleStrict drops the \" (patch)\" suffix Renovate adds to groups",
-      "matchPackageNames": ["!argo-cd", "!traefik", "!cloudflare/cloudflared"],
-      "matchUpdateTypes": ["patch"],
-      "groupName": "patches",
-      "groupSingleUpdates": true,
-      "group": {
-        "commitMessageTopic": "patches: {{#each (distinct (lookupArray upgrades \"depName\"))}}{{{replace \"^.*/\" \"\" this}}}{{#unless @last}}, {{/unless}}{{/each}}"
-      },
-      "schedule": ["* 9-11 * * 1"],
-      "commitMessageExtra": "",
-      "prTitleStrict": true
-    },
-    {
       "description": "Minor and digest bumps once a month, majors any time",
       "matchUpdateTypes": ["minor", "digest"],
       "schedule": ["* * 1 * *"]
+    },
+    {
+      "description": "Patch bumps merge themselves once checks pass (validate, claude-renovate). Rebase lands Renovate's own commit (\"traefik v42.0.1\") on main; a merge or squash via the API gets GitHub's message instead",
+      "matchUpdateTypes": ["patch"],
+      "automerge": true,
+      "automergeStrategy": "rebase"
     },
     {
       "description": "Samba tags look like smbd-only-a<alpine>-s<samba>-r<rev>; track the samba version",
@@ -92,7 +85,6 @@
     {
       "description": "Samba: show the samba version in the commit message",
       "matchPackageNames": ["ghcr.io/servercontainers/samba"],
-      "matchUpdateTypes": ["major", "minor"],
       "commitMessageExtra": "{{{replace \"^.*-s([0-9]+[.][0-9]+[.][0-9]+)-r[0-9]+$\" \"v$1\" newVersion}}}",
       "enabled": true
     }
