@@ -39,7 +39,7 @@ spec:
           image: {{ .image.repository }}:{{ .image.tag }}
           imagePullPolicy: IfNotPresent
           securityContext:
-            {{- toYaml (.securityContext | default $.Values.securityContext) | nindent 12 }}
+            {{- toYaml (mergeOverwrite (deepCopy $.Values.securityContext) (.securityContext | default dict)) | nindent 12 }}
             {{- with .runAsUser }}
             runAsUser: {{ . }}
             {{- end }}
@@ -74,4 +74,18 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            {{- range $i, $path := .writablePaths }}
+            - name: writable-{{ $i }}
+              mountPath: {{ $path }}
+            {{- end }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        {{- range $i, $path := .writablePaths }}
+        - name: writable-{{ $i }}
+          emptyDir: {}
+        {{- end }}
 {{- end }}
