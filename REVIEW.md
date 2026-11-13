@@ -26,7 +26,7 @@ Security: flag anything that grows the attack surface or blast radius.
 
 - Ingress names its entrypoint. HTTP VPN-only: entrypoint `websecure`, middleware `default-http-vpn-only@kubernetescrd`. TCP: the entrypoint configured in `infra/traefik/values.yaml`, middleware `tcp-vpn-only` from `default`. `public` only for public apps.
 - Pods: runAsNonRoot, no privilege escalation, drop ALL, seccomp RuntimeDefault, read-only root fs where possible, requests and limits.
-- hostNetwork, hostPath, hostPort, privileged or extra capabilities need a reason.
+- hostNetwork, hostPath, hostPort, privileged or extra capabilities need a reason, as a PolicyException in `.github/policies/pod-security.yaml`.
 - Secrets only as SealedSecrets, never in values.yaml, env or plain Secrets.
 - Images and charts pinned, never `latest`.
 - NetworkPolicies no wider (sources, destinations, ports) than needed.
