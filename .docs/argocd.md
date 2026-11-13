@@ -27,6 +27,17 @@ One parent Application, `argocd`, manages Argo itself and every file in `infra/a
   3. this repo, `path` with extra manifests (ingress, sealed secrets)
 - **Plain manifests:** a single source, a `path` in this repo.
 
+## Cleanup
+
+What's in the repo is what's on the server, also when something is removed.
+
+- **Prune:** a resource removed from a file is deleted on the next sync
+- **Finalizer:** deleting a child's file in `applications/` deletes everything it deployed, except CRDs with `helm.sh/resource-policy: keep`
+- **No finalizer:** `argocd` (would take Argo down), `sealed-secrets` and `traefik` (CRDs without `keep`, all SealedSecrets and IngressRoutes would go). `argocd app delete` still cascades, `--cascade=false` prevents it
+- **Left behind:** namespaces, data in `/home/server/`, released static PVs
+- **Orphans:** `orphanedResources.warn` in `appproject.yaml` reports resources missing from git in Argo and on Discord, operator-made ones excluded
+- **Outside Argo:** `cluster/` (k0sctl), Image Updater tags, host directories
+
 ## Webhook
 
 A push to this repo triggers a GitHub webhook to `argo.czubinski.dev/api/webhook`, so Argo refreshes right away instead of waiting for its next scheduled check.
