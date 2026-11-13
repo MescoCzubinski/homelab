@@ -20,8 +20,16 @@ envs:
   - name: JAVA_CUSTOM_OPTS
     value: "-Xmx2g -XX:InitialRAMPercentage=0.5 -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=30"
 
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+
 containerSecurityContext:
   allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
   seccompProfile:
     type: RuntimeDefault
 

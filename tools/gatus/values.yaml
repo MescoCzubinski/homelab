@@ -13,6 +13,14 @@ ingress:
 deployment:
   strategy: Recreate
 
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault
+
 env:
   DISCORD_WEBHOOK_URL:
     valueFrom:

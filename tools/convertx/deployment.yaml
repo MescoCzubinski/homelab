@@ -17,6 +17,9 @@ spec:
         app: convertx
     spec:
       securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
       containers:
@@ -31,6 +34,8 @@ spec:
           env:
             - name: TZ
               value: Europe/Warsaw
+            - name: HOME
+              value: /tmp
             - name: LANGUAGE
               value: en-GB
             - name: ALLOW_UNAUTHENTICATED
