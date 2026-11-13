@@ -24,7 +24,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: syncthing-gui-auth
-          image: syncthing/syncthing:2.1.0
+          image: syncthing/syncthing:2.1.7
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -61,7 +61,7 @@ spec:
               mountPath: /tmp
       containers:
         - name: syncthing
-          image: syncthing/syncthing:2.1.0
+          image: syncthing/syncthing:2.1.7
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
