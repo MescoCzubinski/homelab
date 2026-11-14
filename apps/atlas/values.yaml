@@ -4,6 +4,8 @@ postgres: true
 components:
   - name: atlas-backend
     runAsUser: 1000
+    writablePaths:
+      - /app/.model-cache
     image:
       repository: ghcr.io/mescoczubinski/besthacks2026-backend
       tag: v0.0.1
@@ -53,6 +55,8 @@ components:
         memory: 128Mi
   - name: atlas-fetcher
     runAsUser: 10001
+    writablePaths:
+      - /cache
     image:
       repository: ghcr.io/mescoczubinski/besthacks2026-fetcher
       tag: v0.0.1

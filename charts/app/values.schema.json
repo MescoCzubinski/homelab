@@ -40,6 +40,7 @@
           "env": { "type": "array" },
           "secretEnv": { "type": "object", "additionalProperties": { "type": "string", "pattern": "^[^/]+(/[^/]+)?$" } },
           "runAsUser": { "type": "integer" },
+          "writablePaths": { "type": "array", "items": { "type": "string", "pattern": "^/", "not": { "const": "/tmp" } } },
           "securityContext": { "type": "object" },
           "resources": { "type": "object" }
         }
