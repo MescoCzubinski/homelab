@@ -6,7 +6,7 @@ GitOps repo for a single-node k0s cluster on a Mac Mini (node `myserver.home`, L
 
 ## Commands
 
-No build. CI (`.github/workflows/validate.yaml`) renders every Helm-based Application and validates the output with kubeconform. It fails if `charts/app` differs from the chart published on GHCR under the same version. `.github/workflows/trivy.yaml` scans upstream images daily and lists every CRITICAL CVE that has a fix in one issue, `Vulnerability Dashboard`, closed when the list is empty (`apps/` images are skipped, their tags aren't in git). `.github/workflows/gitleaks.yaml` scans the git history on every push to `main`, `.gitleaks.toml` allows SealedSecret ciphertext. `.github/workflows/claude.yaml` answers `@claude` on PRs (Sonnet, may push obvious fixes), `.github/workflows/claude-review.yaml` reviews every push to a non-draft PR against `REVIEW.md` (Sonnet, comments only, skips Renovate and `.md`-only changes). `.github/workflows/claude-renovate.yaml` checks Renovate PRs for breaking changes and fails when one needs an edit or a manual step. To check locally:
+No build. CI (`.github/workflows/validate.yaml`) renders every Helm-based Application and validates the output with kubeconform. It fails if `charts/app` differs from the chart published on GHCR under the same version. It also checks every workload (rendered and plain) against the Pod rules under [Security](#security) with the Kyverno CLI: policies and their exceptions in `.github/policies/pod-security.yaml`, requests and limits not checked. `.github/workflows/trivy.yaml` scans upstream images daily and lists every CRITICAL CVE that has a fix in one issue, `Vulnerability Dashboard`, closed when the list is empty (`apps/` images are skipped, their tags aren't in git). `.github/workflows/gitleaks.yaml` scans the git history on every push, `.gitleaks.toml` allows SealedSecret ciphertext. `.github/workflows/claude.yaml` answers `@claude` on PRs (Sonnet, may push obvious fixes), `.github/workflows/claude-review.yaml` reviews every push to a non-draft PR against `REVIEW.md` (Sonnet, comments only, skips Renovate and `.md`-only changes). `.github/workflows/claude-renovate.yaml` checks Renovate PRs for breaking changes and fails when one needs an edit or a manual step. To check locally:
 
 ```sh
 # charts/app with one app's values (repeat for atlas, homepage, meetly)
@@ -38,7 +38,7 @@ create-secret.sh <namespace> <name> [key] [value]
 
 The labels are set through the Application's `managedNamespaceMetadata`. Tools keep data in `hostPath` under `/home/server/<tool>/`, use `strategy: Recreate` and `revisionHistoryLimit: 3`.
 
-**`charts/app`.** A list of `components`, each rendered as a Deployment + Service. The Ingress routes each component's `paths` on `host` (default `<release>.czubinski.dev`). `access` (`public`/`vpn`/`github`) picks the Traefik entrypoint and middleware. `values.schema.json` has `additionalProperties: false`, so a new value needs a schema entry. `secretEnv` maps `ENV: secret` or `ENV: secret/key`. The chart also ships the app's NetworkPolicies, so app policies are changed here, not in `apps/`.
+**`charts/app`.** A list of `components`, each rendered as a Deployment + Service. The Ingress routes each component's `paths` on `host` (default `<release>.czubinski.dev`). `access` (`public`/`vpn`/`github`) picks the Traefik entrypoint and middleware. `values.schema.json` has `additionalProperties: false`, so a new value needs a schema entry. `secretEnv` maps `ENV: secret` or `ENV: secret/key`. The root fs is read-only: `/tmp` is an `emptyDir`, and `writablePaths` adds one `emptyDir` per path. The chart also ships the app's NetworkPolicies, so app policies are changed here, not in `apps/`.
 
 **Traffic.** Public: Cloudflare → `cloudflared` → Traefik entrypoint `public`. Private: WireGuard → Traefik `websecure` (HTTP, middleware `default-http-vpn-only@kubernetescrd`) or a TCP entrypoint from `infra/traefik/values.yaml` (`IngressRouteTCP` with middleware `tcp-vpn-only` from namespace `default`). The Argo CD webhook is the one `public` route with a middleware (`http-gh-only`, GitHub IP ranges only). Details: `.docs/network.md`.
 
@@ -63,7 +63,7 @@ When you change something in one file and the same improvement applies to its pe
 
 A new tool comes with all of these:
 
-- an Application in `infra/argocd/applications/` with `prune`, `selfHeal`, `CreateNamespace=true` and the tool-tier PSA labels
+- an Application in `infra/argocd/applications/` with `resources-finalizer.argocd.argoproj.io`, `prune`, `selfHeal`, `CreateNamespace=true` and the tool-tier PSA labels
 - `networkpolicy.yaml` with `traefik-to-<tool>` and `gatus-to-<tool>`
 - a check in `tools/gatus/values.yaml`
 - Renovate coverage (an image under `tools/` is picked up automatically, a chart in its Application too)
@@ -78,8 +78,8 @@ A `charts/app` change bumps `Chart.yaml` `version` and must render with the valu
 Make every change as secure as the component allows, especially in `tools/`. Flag anything that grows the attack surface or blast radius:
 
 - Ingress always names its entrypoint. `public` only for public apps, everything else VPN-only through the middlewares above.
-- Pods: `runAsNonRoot`, `allowPrivilegeEscalation: false`, `capabilities.drop: [ALL]`, `seccompProfile: RuntimeDefault`, `readOnlyRootFilesystem: true` with `emptyDir` for writable paths where the image allows it, requests and limits.
-- `hostNetwork`, `hostPath` outside `/home/server/`, `hostPort`, `privileged` or added capabilities need a stated reason (current ones: beszel agent `hostNetwork`, samba running as root with added capabilities, Traefik `hostPort`s, kube-vip static pod with `hostNetwork`, root, `NET_ADMIN`/`NET_RAW` and the admin kubeconfig).
+- Pods: `runAsNonRoot`, `allowPrivilegeEscalation: false`, `capabilities.drop: [ALL]`, `seccompProfile: RuntimeDefault`, `readOnlyRootFilesystem: true` with `emptyDir` for writable paths where the image allows it, `automountServiceAccountToken: false` unless the pod has its own ServiceAccount, requests and limits.
+- `hostNetwork`, `hostPID`, `hostIPC`, `hostPath` outside `/home/server/`, `hostPort`, `privileged` or added capabilities need a stated reason, as a `PolicyException` in `.github/policies/pod-security.yaml` (current ones: beszel agent `hostNetwork`, `hostPID` and read-only `/proc`, `/sys`, samba running as root with added capabilities, Traefik `hostPort`s, kube-vip static pod with `hostNetwork`, root, `NET_ADMIN`/`NET_RAW` and the admin kubeconfig).
 - Secrets only as SealedSecrets, never in `values.yaml`, `env` or plain Secrets.
 - Images and charts pinned to a version, never `latest`.
 - NetworkPolicies no wider (sources, destinations, ports) than needed.

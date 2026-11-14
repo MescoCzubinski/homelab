@@ -13,6 +13,7 @@ spec:
       labels:
         app: beszel-agent
     spec:
+      automountServiceAccountToken: false
       hostNetwork: true
       hostPID: true
       securityContext:

@@ -20,18 +20,32 @@ envs:
   - name: JAVA_CUSTOM_OPTS
     value: "-Xmx2g -XX:InitialRAMPercentage=0.5 -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=30"
 
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+
 containerSecurityContext:
   allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
   seccompProfile:
     type: RuntimeDefault
 
 deployment:
+  arbitraryUid: true
   extraVolumes:
+    - name: tmp
+      emptyDir: {}
     - name: config
       hostPath:
         path: /home/server/stirling/config
         type: DirectoryOrCreate
   extraVolumeMounts:
+    - name: tmp
+      mountPath: /tmp
     - name: config
       mountPath: /configs
 

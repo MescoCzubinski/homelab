@@ -3,12 +3,14 @@ kind: Application
 metadata:
   name: homepage
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   sources:
     - repoURL: ghcr.io/mescoczubinski/charts
       chart: app
-      targetRevision: 0.2.2
+      targetRevision: 0.3.1
       helm:
         releaseName: homepage
         valueFiles:

@@ -12,6 +12,8 @@ jobs:
     env:
       KUBERNETES_VERSION: 1.36.2
       KUBECONFORM_VERSION: v0.7.0
+      KYVERNO_VERSION: v1.19.2
+      KYVERNO_SHA256: 357eaf1df8bc24ddd5a73979fadeaae6a032e8710f11af264229756e4956bf4a
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -20,6 +22,12 @@ jobs:
         run: |
           curl -sSL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" | tar -xz kubeconform
           sudo mv kubeconform /usr/local/bin/
+      - name: Install Kyverno CLI
+        run: |
+          curl -sSL "https://github.com/kyverno/kyverno/releases/download/${KYVERNO_VERSION}/kyverno-cli_${KYVERNO_VERSION}_linux_x86_64.tar.gz" -o kyverno.tar.gz
+          echo "$KYVERNO_SHA256  kyverno.tar.gz" | sha256sum -c -
+          tar -xzf kyverno.tar.gz kyverno
+          sudo mv kyverno /usr/local/bin/
       - name: Check charts/app version bump
         run: |
           version=$(yq -r .version charts/app/Chart.yaml)
@@ -48,5 +56,12 @@ jobs:
         run: kubeconform -strict -summary -ignore-missing-schemas -kubernetes-version "$KUBERNETES_VERSION" -skip SealedSecret < rendered.yaml
       - name: Validate plain manifests
         run: kubeconform -strict -summary -ignore-missing-schemas -kubernetes-version "$KUBERNETES_VERSION" -skip SealedSecret -ignore-filename-pattern 'values.yaml' -ignore-filename-pattern 'k0sctl.yaml' tools infra cluster
+      - name: Check pod security
+        run: |
+          yq 'select(.kind == ("Pod", "Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"))' rendered.yaml \
+            $(find tools infra cluster -name '*.yaml' ! -name values.yaml ! -name k0sctl.yaml) > workloads.yaml
+          yq 'select(.kind == "ValidatingPolicy")' .github/policies/pod-security.yaml > policies.yaml
+          yq 'select(.kind == "PolicyException")' .github/policies/pod-security.yaml > exceptions.yaml
+          kyverno apply policies.yaml -e exceptions.yaml -r workloads.yaml --warn-no-pass --warn-exit-code 1 --remove-color
       - name: Parse YAML that kubeconform skips
         run: yq -e true cluster/k0sctl.yaml apps/*/sealed-secret.yaml > /dev/null

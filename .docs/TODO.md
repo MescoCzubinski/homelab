@@ -21,7 +21,7 @@
 - [x] Readiness probes — no traffic to pods that aren't up
 - [x] Postgres — shared CloudNativePG database, no backups
 - [x] NetworkPolicy — default-deny ingress, allow Traefik
-- [x] Container hardening — non-root, read-only fs, seccomp
+- [x] Container hardening — non-root, read-only fs, seccomp, no ServiceAccount token
 - [x] Pod Security labels — enforced per namespace
 - [x] Renovate — tracks pinned versions beyond Image Updater
 - [x] CI — Renovate, CodeRabbit and Claude Code Review configuration files
@@ -32,7 +32,8 @@
 - [x] Versioned app chart — OCI on GHCR, apps pin a version
 - [x] Postgres per app — independent CNPG cluster for each app
 - [x] Discord webhooks — alerts from Gatus and Argo CD
-- [x] CI security — daily Trivy CVE scan with a dashboard issue, Gitleaks on push to main, push protection
+- [x] CI security — daily Trivy CVE scan with a dashboard issue, Gitleaks on every push, push protection
+- [x] Pod policies in CI — Kyverno CLI checks every workload, exceptions with reasons
 - [x] API via VIP — kube-vip static pod, etcd stays on node IP
 - [ ] Terraform — OpenTofu state and CI
 - [ ] Cloudflare config in repo — DNS and tunnels (OpenTofu)

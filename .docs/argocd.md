@@ -16,7 +16,7 @@ One parent Application, `argocd`, manages Argo itself and every file in `infra/a
 
 - the Argo CD chart itself, including the GUI and its VPN-only ingress (`server.ingress`)
 - the webhook ingress `ingress-gh.yaml`
-- `sealed-secret.yaml` and `networkpolicy.yaml` from `infra/argocd`
+- `sealed-secret.yaml`, `networkpolicy.yaml` and `appproject.yaml` (the `default` project) from `infra/argocd`
 - one child Application per file in `applications/`
 
 ## Sources
@@ -26,6 +26,17 @@ One parent Application, `argocd`, manages Argo itself and every file in `infra/a
   2. this repo, only `ref: values`, so `$values` points at it
   3. this repo, `path` with extra manifests (ingress, sealed secrets)
 - **Plain manifests:** a single source, a `path` in this repo.
+
+## Cleanup
+
+What's in the repo is what's on the server, also when something is removed.
+
+- **Prune:** a resource removed from a file is deleted on the next sync
+- **Finalizer:** deleting a child's file in `applications/` deletes everything it deployed, except CRDs with `helm.sh/resource-policy: keep`
+- **No finalizer:** `argocd` (would take Argo down), `sealed-secrets` and `traefik` (CRDs without `keep`, all SealedSecrets and IngressRoutes would go). `argocd app delete` still cascades, `--cascade=false` prevents it
+- **Left behind:** namespaces, data in `/home/server/`, released static PVs
+- **Orphans:** `orphanedResources.warn` in `appproject.yaml` reports resources missing from git in Argo and on Discord, operator-made ones excluded, `ignore` lists the ones made outside git on purpose
+- **Outside Argo:** `cluster/` (k0sctl), Image Updater tags, host directories
 
 ## Webhook
 

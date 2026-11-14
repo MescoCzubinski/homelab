@@ -8,6 +8,8 @@ Dashed `svc` boxes are config only: Traefik reads pod IPs from them and connects
 
 ## Addresses and data
 
+Pods run non-root, and each data directory must be owned by the pod's uid on the host: `1000:1000`, Gatus `65534:65534`.
+
 - **Basic Memory:** MCP server at `memory.czubinski.dev/mcp`, notes in `/home/server/basic-memory/data`, SQLite index and embedding model in `/home/server/basic-memory/config`
 - **Beszel:** server monitoring at `beszel.czubinski.dev`, data in `/home/server/beszel/hub-data`
 - **ConvertX:** file conversion at `convert.czubinski.dev`, data in `/home/server/convertx/data`

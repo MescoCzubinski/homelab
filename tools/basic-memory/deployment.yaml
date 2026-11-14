@@ -16,6 +16,7 @@ spec:
       labels:
         app: basic-memory
     spec:
+      automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
