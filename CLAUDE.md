@@ -63,7 +63,7 @@ When you change something in one file and the same improvement applies to its pe
 
 A new tool comes with all of these:
 
-- an Application in `infra/argocd/applications/` with `prune`, `selfHeal`, `CreateNamespace=true` and the tool-tier PSA labels
+- an Application in `infra/argocd/applications/` with `resources-finalizer.argocd.argoproj.io`, `prune`, `selfHeal`, `CreateNamespace=true` and the tool-tier PSA labels
 - `networkpolicy.yaml` with `traefik-to-<tool>` and `gatus-to-<tool>`
 - a check in `tools/gatus/values.yaml`
 - Renovate coverage (an image under `tools/` is picked up automatically, a chart in its Application too)

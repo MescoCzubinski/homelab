@@ -22,6 +22,9 @@ server:
 dex:
   enabled: false
 
+redis:
+  automountServiceAccountToken: false
+
 notifications:
   secret:
     create: false
@@ -39,6 +42,7 @@ notifications:
         - on-health-degraded
         - on-deployed
         - on-created
+        - on-orphaned-resources
   templates:
     template.app-sync-failed: |
       webhook:
@@ -89,6 +93,18 @@ notifications:
                 "color": 3447003
               }]
             }
+    template.app-orphaned-resources: |
+      webhook:
+        discord:
+          method: POST
+          body: |
+            {
+              "embeds": [{
+                "title": "{{.app.metadata.name}}: orphaned resources",
+                "url": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+                "color": 15105570
+              }]
+            }
   triggers:
     trigger.on-sync-failed: |
       - description: Application syncing has failed
@@ -113,3 +129,8 @@ notifications:
           - app-created
         oncePer: app.metadata.name
         when: "true"
+    trigger.on-orphaned-resources: |
+      - description: Application namespace has resources not in git
+        send:
+          - app-orphaned-resources
+        when: app.status.conditions != nil and any(app.status.conditions, {.type == 'OrphanedResourceWarning'})

@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: default
+  namespace: argocd
+spec:
+  sourceRepos:
+    - "*"
+  destinations:
+    - server: "*"
+      namespace: "*"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  orphanedResources:
+    warn: true
+    ignore:
+      - kind: Secret
+        name: argocd-redis
+      - kind: Secret
+        name: repository-homelab
+      - kind: Secret
+        name: sealed-secrets-key*
+      - kind: ConfigMap
+        name: cnpg-default-monitoring
