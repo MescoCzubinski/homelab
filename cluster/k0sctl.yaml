@@ -35,7 +35,9 @@ spec:
             expiresAfter: 87600h0m0s
           k0sApiPort: 9443
           port: 6443
-        controllerManager: {}
+        controllerManager:
+          extraArgs:
+            terminated-pod-gc-threshold: "1"
         extensions:
           helm:
             concurrencyLevel: 5
