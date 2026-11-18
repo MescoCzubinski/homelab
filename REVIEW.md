@@ -42,7 +42,7 @@ Consistency: same kind of component, same shape.
 
 ### `charts/app/`
 
-Every change bumps the version in `Chart.yaml` and must work with the values of atlas, homepage and meetly.
+Every change bumps the version in `Chart.yaml` and must work with the values of atlas, homepage, meetly and oilfuel-analysis.
 
 ### `.docs/`
 

@@ -39,7 +39,7 @@ reviews:
         - Upstream charts over hand-written manifests where possible, values in this repo (`$values`).
         - Reuse existing patterns instead of adding new ones.
     - path: "charts/app/**"
-      instructions: "Every change bumps the version in Chart.yaml and must work with the values of atlas, homepage and meetly."
+      instructions: "Every change bumps the version in Chart.yaml and must work with the values of atlas, homepage, meetly and oilfuel-analysis."
     - path: ".docs/**"
       instructions: "README, .docs and TODO must match the code changes in the PR."
   tools:
