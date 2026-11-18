@@ -47,8 +47,8 @@ The VIP is a LAN address, so `6443` on it is still closed on `enp1s0f0` and open
 Traffic inside the cluster is closed by default and opened one path at a time. Every app, tool and infra namespace is default-deny for incoming traffic, and each policy allows one source to reach one destination. A compromised pod therefore can't reach its neighbours.
 
 - **Apps and tools:** accept traffic only from the `traefik` namespace, so nothing is reachable except through Traefik. Gatus is also allowed in, to probe the services.
-- **Databases:** an app's `<app>-pg` pods accept traffic only from the app itself and from `cnpg-system`, see [database.md](database.md#access).
-- **Public apps:** also have egress rules, because they are the most likely to be compromised. They can reach DNS, their own namespace and the internet, but not the LAN, the node (kubelet, API server) or other namespaces. Only the database reaches the API server, which CloudNativePG needs.
+- **Databases:** an app's `<app>-pg` and `<app>-duckdb` pods accept traffic only from the app itself, and `<app>-pg` also from `cnpg-system`, see [database.md](database.md#access).
+- **Apps:** also have egress rules, because public apps are the most likely to be compromised. They can reach DNS, their own namespace and the internet, but not the LAN, the node (kubelet, API server) or other namespaces. Only the database reaches the API server, which CloudNativePG needs.
 - **Infra:** `argocd`, `cloudflared`, `traefik`, `cnpg-system` and `sealed-secrets` allow only what they need. `cloudflared` allows nothing in, since it only makes outbound connections. The API server runs on the host network, so the webhook ports of `cnpg-system` and `sealed-secrets` are open to anywhere.
 
 Policies are named `<from>-to-<to>`, after the direction of the traffic they allow, e.g. `traefik-to-<app>` or `<app>-to-dns`. A policy lives in the namespace it protects, and `nobody-to-<namespace>` is the default-deny. The policies of apps come from `charts/app`, those of tools and infra from their own directories.

@@ -1,4 +1,6 @@
-{{- range .Values.components }}
+{{- range fromYamlArray (include "app.workloads" .) }}
+{{- if .port }}
+{{- $args := dict "root" $ "workload" . }}
 ---
 apiVersion: v1
 kind: Service
@@ -6,16 +8,13 @@ metadata:
   name: {{ .name }}
   namespace: {{ $.Release.Namespace }}
   labels:
-    app.kubernetes.io/name: {{ .name }}
-    app.kubernetes.io/instance: {{ $.Release.Name }}
-    app.kubernetes.io/version: {{ .image.tag | quote }}
-    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+    {{- include "app.labels" $args | nindent 4 }}
 spec:
   selector:
-    app.kubernetes.io/name: {{ .name }}
-    app.kubernetes.io/instance: {{ $.Release.Name }}
+    {{- include "app.selectorLabels" $args | nindent 4 }}
   ports:
     - name: http
       port: {{ .port }}
       targetPort: http
+{{- end }}
 {{- end }}

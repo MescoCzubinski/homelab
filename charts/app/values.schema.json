@@ -11,24 +11,44 @@
     "postgres": { "type": "boolean" },
     "imagePullSecrets": { "type": "array", "items": { "type": "string" } },
     "securityContext": { "type": "object" },
+    "image": { "$ref": "#/definitions/image" },
+    "duckdb": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["image"],
+      "properties": { "image": { "$ref": "#/definitions/image" } }
+    },
+    "jobs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "command"],
+        "properties": {
+          "name": { "type": "string" },
+          "image": { "$ref": "#/definitions/image" },
+          "command": { "$ref": "#/definitions/command" },
+          "env": { "type": "array" },
+          "secretEnv": { "$ref": "#/definitions/secretEnv" },
+          "runAsUser": { "type": "integer" },
+          "writablePaths": { "$ref": "#/definitions/writablePaths" },
+          "securityContext": { "type": "object" },
+          "resources": { "type": "object" }
+        }
+      }
+    },
     "components": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["name", "image", "port"],
+        "required": ["name"],
+        "dependencies": { "paths": ["port"], "probe": ["port"] },
         "properties": {
           "name": { "type": "string" },
-          "image": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["repository", "tag"],
-            "properties": {
-              "repository": { "type": "string" },
-              "tag": { "type": "string" }
-            }
-          },
+          "image": { "$ref": "#/definitions/image" },
+          "command": { "$ref": "#/definitions/command" },
           "port": { "type": "integer" },
           "paths": { "type": "array", "items": { "type": "string", "pattern": "^/" } },
           "probe": {
@@ -38,13 +58,34 @@
             "properties": { "path": { "type": "string", "pattern": "^/" } }
           },
           "env": { "type": "array" },
-          "secretEnv": { "type": "object", "additionalProperties": { "type": "string", "pattern": "^[^/]+(/[^/]+)?$" } },
+          "secretEnv": { "$ref": "#/definitions/secretEnv" },
           "runAsUser": { "type": "integer" },
-          "writablePaths": { "type": "array", "items": { "type": "string", "pattern": "^/", "not": { "const": "/tmp" } } },
+          "writablePaths": { "$ref": "#/definitions/writablePaths" },
           "securityContext": { "type": "object" },
           "resources": { "type": "object" }
         }
       }
     }
+  },
+  "if": { "not": { "required": ["image"] } },
+  "then": {
+    "properties": {
+      "components": { "items": { "required": ["image"] } },
+      "jobs": { "items": { "required": ["image"] } }
+    }
+  },
+  "definitions": {
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "tag"],
+      "properties": {
+        "repository": { "type": "string" },
+        "tag": { "type": "string" }
+      }
+    },
+    "command": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "secretEnv": { "type": "object", "additionalProperties": { "type": "string", "pattern": "^[^/]+(/[^/]+)?$" } },
+    "writablePaths": { "type": "array", "items": { "type": "string", "pattern": "^/", "not": { "const": "/tmp" } } }
   }
 }

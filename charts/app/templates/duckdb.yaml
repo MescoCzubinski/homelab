@@ -1,0 +1,14 @@
+{{- if .Values.duckdb }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "app.duckdbName" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  storageClassName: local-duckdb
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+{{- end }}

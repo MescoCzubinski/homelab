@@ -11,7 +11,7 @@ Single-node Kubernetes homelab on a Mac Mini, run with k0s and managed by Argo C
 - **GitOps:** Argo CD ([argocd.md](.docs/argocd.md))
 - **Ingress:** Traefik, config in `infra/traefik/values.yaml`
 - **Public access:** Cloudflare Tunnel (`cloudflared`)
-- **Database:** CloudNativePG ([database.md](.docs/database.md))
+- **Database:** CloudNativePG, DuckDB ([database.md](.docs/database.md))
 - **Secrets:** Sealed Secrets
 - **Updates:** Renovate and Argo CD Image Updater ([argocd.md](.docs/argocd.md))
 
