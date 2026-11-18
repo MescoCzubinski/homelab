@@ -53,6 +53,7 @@
 - [x] Meetly
 - [x] Atlas
 - [x] Basic Memory
+- [x] Oilfuel Analysis
 - [ ] RustDesk
 - [ ] Sonarr, Radarr, Lidarr
 - [ ] AFFiNE

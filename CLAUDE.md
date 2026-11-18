@@ -9,7 +9,7 @@ GitOps repo for a single-node k0s cluster on a Mac Mini (node `myserver.home`, L
 No build. CI (`.github/workflows/validate.yaml`) renders every Helm-based Application and validates the output with kubeconform. It fails if `charts/app` differs from the chart published on GHCR under the same version. It also checks every workload (rendered and plain) against the Pod rules under [Security](#security) with the Kyverno CLI: policies and their exceptions in `.github/policies/pod-security.yaml`, requests and limits not checked. `.github/workflows/trivy.yaml` scans upstream images daily and lists every CRITICAL CVE that has a fix in one issue, `Vulnerability Dashboard`, closed when the list is empty (`apps/` images are skipped, their tags aren't in git). `.github/workflows/gitleaks.yaml` scans the git history on every push, `.gitleaks.toml` allows SealedSecret ciphertext. `.github/workflows/claude.yaml` answers `@claude` on PRs (Sonnet, may push obvious fixes), `.github/workflows/claude-review.yaml` reviews every push to a non-draft PR against `REVIEW.md` (Sonnet, comments only, skips Renovate and `.md`-only changes). `.github/workflows/claude-renovate.yaml` checks Renovate PRs for breaking changes and fails when one needs an edit or a manual step. To check locally:
 
 ```sh
-# charts/app with one app's values (repeat for atlas, homepage, meetly)
+# charts/app with one app's values (repeat for atlas, homepage, meetly, oilfuel-analysis)
 helm lint charts/app -n atlas -f apps/atlas/values.yaml
 helm template atlas charts/app -n atlas -f apps/atlas/values.yaml
 
@@ -33,7 +33,7 @@ create-secret.sh <namespace> ghcr-pull
 
 | tier     | how it's deployed                                                                 | access                         | Pod Security labels                  |
 | -------- | --------------------------------------------------------------------------------- | ------------------------------ | ------------------------------------ |
-| `apps/`  | `values.yaml` for the shared `charts/app` chart, Application pins a chart version | `public` via Cloudflare tunnel | `enforce`/`warn`/`audit: restricted` |
+| `apps/`  | `values.yaml` for the shared `charts/app` chart, Application pins a chart version | `public` via Cloudflare tunnel, or none (no Ingress) | `enforce`/`warn`/`audit: restricted` |
 | `tools/` | upstream chart + `values.yaml` where one exists, else plain manifests             | VPN only                       | `warn`/`audit: restricted`           |
 | `infra/` | upstream chart or plain manifests                                                 | n/a                            | `warn`/`audit: baseline`             |
 
@@ -70,7 +70,7 @@ A new tool comes with all of these:
 - Renovate coverage (an image under `tools/` is picked up automatically, a chart in its Application too)
 - the docs listed under [Docs](#docs)
 
-A `charts/app` change bumps `Chart.yaml` `version` and must render with the values of atlas, homepage and meetly.
+A `charts/app` change bumps `Chart.yaml` `version` and must render with the values of atlas, homepage, meetly and oilfuel-analysis.
 
 `.coderabbit.yaml` and `REVIEW.md` (Claude Code Review) hold the same review rules. A change to one goes into the other in the same commit.
 
@@ -90,7 +90,7 @@ Make every change as secure as the component allows, especially in `tools/`. Fla
 
 After any change, check whether `README.md`, `.docs/*.md` or `.docs/TODO.md` describe what you changed, and update them in the same change. Keep their terse style.
 
-- README body links only to `.docs/` documents. Repo paths go in backticks, no external links. The Services section is the exception: public apps link to their live URL, tools to their project page.
+- README body links only to `.docs/` documents. Repo paths go in backticks, no external links. The Services section is the exception: public apps link to their live URL, tools to their project page, own apps without a public URL have no link.
 - `.docs/images/*.png` are diagrams that can't be edited here. If a change makes one outdated, tell the user.
 
 ### Commits
@@ -101,7 +101,7 @@ Messages are lowercase, with no trailing period. `{name}` is the app or director
 - **Update, no bump:** `{name}: {changes}`, e.g. `gatus: networkpolicies`. No `v{version}`, because the commit changes no version. Also used for things without a version, e.g. `kubelet: worker profile`
 - **Update and bump:** `{name} v{version}: {changes}`, e.g. `cloudflared v2026.10.3: read-only fs`
 - **Init:** `{name} v{version}: init`, e.g. `gatus v1.5.0: init`. `{version}` is the version the app starts with, or the first version tracked in the repo if it started on `latest`
-- **Init, own app:** `{name} v0.0.1: init`, e.g. `atlas v0.0.1: init`. Own apps (atlas, homepage, meetly) always start at `v0.0.1`
+- **Init, own app:** `{name} v0.0.1: init`, e.g. `atlas v0.0.1: init`. Own apps (atlas, homepage, meetly, oilfuel-analysis) always start at `v0.0.1`
 - **Init, no version:** `{name}: init`, e.g. `namespaces: init`. For plain resources without a version
 - **Several tools:** `tools: {changes}`, e.g. `tools: recreate strategy`. For a change to the `tools/` directory as a whole (sometimes cloudflared). A change to one tool uses that tool's name
 - **CI, Renovate, CodeRabbit, `REVIEW.md`:** `ci: {changes}`, e.g. `ci: renovate commit format`

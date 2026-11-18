@@ -20,10 +20,11 @@ Single-node Kubernetes homelab on a Mac Mini, run with k0s and managed by Argo C
 ```
 .docs/                   docs and diagrams
 .github/                 CI workflows
-apps/                    public apps
+apps/                    own apps
   atlas/
   homepage/
   meetly/
+  oilfuel-analysis/
 charts/
   app/                   Helm chart for apps
 cluster/                 k0s config, static pods
@@ -46,7 +47,7 @@ tools/                   private tools
   syncthing/
 ```
 
-Each public app in `apps/` is a `values.yaml` for the shared `charts/app` Helm chart, plus `sealed-secret.yaml` if needed. Apps pin a chart version, published to GHCR when a `vX.Y.Z` tag matching `charts/app/Chart.yaml` is pushed.
+Each own app in `apps/` is a `values.yaml` for the shared `charts/app` Helm chart, plus `sealed-secret.yaml` if needed. Apps pin a chart version, published to GHCR when a `vX.Y.Z` tag matching `charts/app/Chart.yaml` is pushed.
 
 Each private tool in `tools/` has its own Application: a plain directory of manifests, or a `values.yaml` for an upstream chart where one exists.
 
@@ -65,6 +66,7 @@ Each private tool in `tools/` has its own Application: a plain directory of mani
 - [Beszel](https://beszel.dev) - server monitoring
 - [ConvertX](https://github.com/C4illin/ConvertX) - file converter
 - [Gatus](https://gatus.io) - status page and health checks
+- oilfuel-analysis - tanker AIS and fuel price pipeline (Dagster), own app with no UI
 - [Stirling PDF](https://www.stirling.com) - PDF tools
 - [Syncthing](https://syncthing.net) - file sync
 - [Samba](https://www.samba.org) - network file share
