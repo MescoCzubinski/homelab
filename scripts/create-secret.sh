@@ -3,6 +3,7 @@ set -euo pipefail
 
 if [ $# -lt 2 ] || [ $# -gt 4 ] || [[ ! $2 =~ ^[a-z0-9.-]+$ ]]; then
   echo "usage: create-secret.sh <namespace> <name> [key] [value]" >&2
+  echo "       create-secret.sh <namespace> ghcr-pull" >&2
   exit 1
 fi
 
@@ -10,17 +11,35 @@ namespace=$1
 name=$2
 key=${3:-}
 value=${4:-}
+type=""
 
-if [ $# -lt 4 ] && [ ! -t 0 ]; then
-  echo "key and value must be parameters or typed at the prompt, nothing changed" >&2
-  exit 1
-fi
-if [ $# -lt 3 ]; then
-  read -rp "key: " key
-fi
-if [ $# -lt 4 ]; then
-  read -rsp "value: " value
-  echo
+if [ "$name" = ghcr-pull ]; then
+  if [ $# -gt 2 ]; then
+    echo "ghcr-pull takes no key or value, it is copied from the cluster, nothing changed" >&2
+    exit 1
+  fi
+
+  sources=$(kubectl get secrets -A --field-selector metadata.name=ghcr-pull -o jsonpath='{.items[*].metadata.namespace}')
+  source=${sources%% *}
+  if [ -z "$source" ]; then
+    echo "no ghcr-pull in the cluster to copy, nothing changed" >&2
+    exit 1
+  fi
+  key=.dockerconfigjson
+  value=$(kubectl get secret ghcr-pull -n "$source" -o jsonpath='{.data.\.dockerconfigjson}' | base64 -d)
+  type=kubernetes.io/dockerconfigjson
+else
+  if [ $# -lt 4 ] && [ ! -t 0 ]; then
+    echo "key and value must be parameters or typed at the prompt, nothing changed" >&2
+    exit 1
+  fi
+  if [ $# -lt 3 ]; then
+    read -rp "key: " key
+  fi
+  if [ $# -lt 4 ]; then
+    read -rsp "value: " value
+    echo
+  fi
 fi
 if [[ ! $key =~ ^[-._a-zA-Z0-9]+$ ]] || [ -z "$value" ]; then
   echo "invalid key or empty value, nothing changed" >&2
@@ -75,4 +94,7 @@ spec:
       name: $name
       namespace: $namespace
 EOF
+  if [ -n "$type" ]; then
+    echo "    type: $type" >>"$file"
+  fi
 fi
