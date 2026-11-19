@@ -22,3 +22,28 @@ spec:
               operator: In
               values:
                 - myserver.home
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-oilfuel-analysis
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-postgres
+  claimRef:
+    namespace: oilfuel-analysis
+    name: oilfuel-analysis-pg-1
+  local:
+    path: /home/server/postgres/oilfuel-analysis
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - myserver.home
