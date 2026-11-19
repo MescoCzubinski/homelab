@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: duckdb-oilfuel-analysis
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-duckdb
+  claimRef:
+    namespace: oilfuel-analysis
+    name: oilfuel-analysis-duckdb
+  local:
+    path: /home/server/duckdb/oilfuel-analysis
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - myserver.home

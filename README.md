@@ -32,6 +32,7 @@ infra/
   argocd-image-updater/  Image Updater
   cloudflared/           Cloudflare Tunnel
   cnpg/                  CloudNativePG, database storage
+  duckdb/                DuckDB storage
   sealed-secrets/        Sealed Secrets
   traefik/               Traefik, middlewares
 scripts/                 helper scripts, on PATH through flake.nix
