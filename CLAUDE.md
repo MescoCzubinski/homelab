@@ -79,7 +79,7 @@ A `charts/app` change bumps `Chart.yaml` `version` and must render with the valu
 Make every change as secure as the component allows, especially in `tools/`. Flag anything that grows the attack surface or blast radius:
 
 - Ingress always names its entrypoint. `public` only for public apps, everything else VPN-only through the middlewares above.
-- Pods: `runAsNonRoot`, `allowPrivilegeEscalation: false`, `capabilities.drop: [ALL]`, `seccompProfile: RuntimeDefault`, `readOnlyRootFilesystem: true` with `emptyDir` for writable paths where the image allows it, `automountServiceAccountToken: false` unless the pod has its own ServiceAccount, requests and limits.
+- Pods: `runAsNonRoot`, `allowPrivilegeEscalation: false`, `capabilities.drop: [ALL]`, `seccompProfile: RuntimeDefault`, `readOnlyRootFilesystem: true` with `emptyDir` for writable paths where the image allows it, `automountServiceAccountToken: false` unless the pod has its own ServiceAccount. Requests and limits on every component and job of an app in `apps/`, set in its `values.yaml`, never hardcoded in `charts/app`. Infra, tools and the database servers (Postgres, DuckDB) have none.
 - `hostNetwork`, `hostPID`, `hostIPC`, `hostPath` outside `/home/server/`, `hostPort`, `privileged` or added capabilities need a stated reason, as a `PolicyException` in `.github/policies/pod-security.yaml` (current ones: beszel agent `hostNetwork`, `hostPID` and read-only `/proc`, `/sys`, samba running as root with added capabilities, Traefik `hostPort`s, kube-vip static pod with `hostNetwork`, root, `NET_ADMIN`/`NET_RAW` and the admin kubeconfig).
 - Secrets only as SealedSecrets, never in `values.yaml`, `env` or plain Secrets.
 - Images and charts pinned to a version, never `latest`.
