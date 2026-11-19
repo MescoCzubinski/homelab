@@ -1,4 +1,5 @@
-{{- range .Values.components }}
+{{- range fromYamlArray (include "app.workloads" .) }}
+{{- $args := dict "root" $ "workload" . }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -6,87 +7,25 @@ metadata:
   name: {{ .name }}
   namespace: {{ $.Release.Namespace }}
   labels:
-    app.kubernetes.io/name: {{ .name }}
-    app.kubernetes.io/instance: {{ $.Release.Name }}
-    app.kubernetes.io/version: {{ .image.tag | quote }}
-    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+    {{- include "app.labels" $args | nindent 4 }}
+  {{- if $.Values.jobs }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  {{- end }}
 spec:
   replicas: 1
   revisionHistoryLimit: 3
+  {{- if .duckdb }}
+  strategy:
+    type: Recreate
+  {{- end }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ .name }}
-      app.kubernetes.io/instance: {{ $.Release.Name }}
+      {{- include "app.selectorLabels" $args | nindent 6 }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ .name }}
-        app.kubernetes.io/instance: {{ $.Release.Name }}
-        app.kubernetes.io/version: {{ .image.tag | quote }}
-        app.kubernetes.io/managed-by: {{ $.Release.Service }}
+        {{- include "app.labels" $args | nindent 8 }}
     spec:
-      automountServiceAccountToken: false
-      {{- with $.Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- range . }}
-        - name: {{ . }}
-        {{- end }}
-      {{- end }}
-      securityContext:
-        seccompProfile:
-          type: RuntimeDefault
-      containers:
-        - name: {{ .name }}
-          image: {{ .image.repository }}:{{ .image.tag }}
-          imagePullPolicy: IfNotPresent
-          securityContext:
-            {{- toYaml (mergeOverwrite (deepCopy $.Values.securityContext) (.securityContext | default dict)) | nindent 12 }}
-            {{- with .runAsUser }}
-            runAsUser: {{ . }}
-            {{- end }}
-          {{- if or .env .secretEnv }}
-          env:
-            {{- with .env }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
-            {{- range $name, $secret := .secretEnv }}
-            {{- $ref := splitList "/" $secret }}
-            - name: {{ $name }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ first $ref }}
-                  key: {{ if gt (len $ref) 1 }}{{ last $ref }}{{ else }}{{ $name }}{{ end }}
-            {{- end }}
-          {{- end }}
-          ports:
-            - name: http
-              containerPort: {{ .port }}
-          readinessProbe:
-            {{- with .probe }}
-            httpGet:
-              path: {{ .path }}
-              port: http
-            {{- else }}
-            tcpSocket:
-              port: http
-            {{- end }}
-            periodSeconds: 5
-          {{- with .resources }}
-          resources:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          volumeMounts:
-            - name: tmp
-              mountPath: /tmp
-            {{- range $i, $path := .writablePaths }}
-            - name: writable-{{ $i }}
-              mountPath: {{ $path }}
-            {{- end }}
-      volumes:
-        - name: tmp
-          emptyDir: {}
-        {{- range $i, $path := .writablePaths }}
-        - name: writable-{{ $i }}
-          emptyDir: {}
-        {{- end }}
+      {{- include "app.podSpec" $args | nindent 6 }}
 {{- end }}

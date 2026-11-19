@@ -2,7 +2,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: {{ .Release.Name }}-pg
+  name: {{ include "app.postgresName" . }}
   namespace: {{ .Release.Namespace }}
 spec:
   instances: 1

@@ -1,15 +1,21 @@
+{{- $listens := false }}
+{{- range .Values.components }}
+{{- if .port }}
+{{- $listens = true }}
+{{- end }}
+{{- end }}
+{{- /* This policy is also the app pods' default-deny, so an app with nothing listening still gets one, with no allows. */}}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: traefik-to-{{ .Release.Name }}
+  name: {{ ternary "traefik" "nobody" $listens }}-to-{{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
 spec:
   podSelector:
-    matchExpressions:
-      - key: cnpg.io/cluster
-        operator: DoesNotExist
+    {{- include "app.appPodSelector" . | nindent 4 }}
   policyTypes:
     - Ingress
+  {{- if $listens }}
   ingress:
     - from:
         - namespaceSelector:
@@ -17,6 +23,7 @@ spec:
               kubernetes.io/metadata.name: traefik
     - from:
         - podSelector: {}
+  {{- end }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -48,9 +55,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   podSelector:
-    matchExpressions:
-      - key: cnpg.io/cluster
-        operator: DoesNotExist
+    {{- include "app.appPodSelector" . | nindent 4 }}
   policyTypes:
     - Egress
   egress:
@@ -73,7 +78,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      cnpg.io/cluster: {{ .Release.Name }}-pg
+      cnpg.io/cluster: {{ include "app.postgresName" . }}
   policyTypes:
     - Ingress
   ingress:
@@ -93,12 +98,13 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      cnpg.io/cluster: {{ .Release.Name }}-pg
+      cnpg.io/cluster: {{ include "app.postgresName" . }}
   policyTypes:
     - Ingress
   ingress:
     - from:
-        - podSelector: {}
+        - podSelector:
+            {{- include "app.appPodSelector" . | nindent 12 }}
       ports:
         - port: 5432
 ---
@@ -110,7 +116,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      cnpg.io/cluster: {{ .Release.Name }}-pg
+      cnpg.io/cluster: {{ include "app.postgresName" . }}
   policyTypes:
     - Egress
   egress:
@@ -119,4 +125,24 @@ spec:
             cidr: 192.168.1.101/32
       ports:
         - port: 6443
+{{- end }}
+{{- if .Values.duckdb }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-to-{{ include "app.duckdbName" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "app.duckdbName" . }}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            {{- include "app.appPodSelector" . | nindent 12 }}
+      ports:
+        - port: {{ .Values.duckdb.port }}
 {{- end }}
