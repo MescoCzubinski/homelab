@@ -1,0 +1,77 @@
+postgres: true
+
+duckdb:
+  image:
+    repository: ghcr.io/mescoczubinski/bisystemsoilfuelanalysis-duckdb
+    tag: v0.0.1
+  port: 9494
+
+image:
+  repository: ghcr.io/mescoczubinski/bisystemsoilfuelanalysis-pipeline
+  tag: v0.0.1
+
+jobs:
+  - name: oilfuel-analysis-migrate
+    runAsUser: 1000
+    command:
+      - dbmate
+      - --wait
+      - up
+    env:
+      - name: DBMATE_MIGRATIONS_DIR
+        value: ./migrations
+      - name: DBMATE_NO_DUMP_SCHEMA
+        value: "true"
+    secretEnv:
+      DATABASE_URL: oilfuel-analysis-pg-app/uri
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 200m
+        memory: 128Mi
+
+components:
+  - name: oilfuel-analysis-dagster
+    runAsUser: 1000
+    command:
+      - dagster-daemon
+      - run
+      - -m
+      - services.dagster_server
+    env:
+      - name: PYTHONPATH
+        value: /app/src
+      - name: RUNTIME__DLTHUB_TELEMETRY
+        value: "false"
+    secretEnv:
+      DB_URL: oilfuel-analysis-pg-app/uri
+      DESTINATION__POSTGRES__CREDENTIALS: oilfuel-analysis-pg-app/uri
+      QUACK_TOKEN: oilfuel-analysis-duckdb/token
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 2Gi
+  - name: oilfuel-analysis-ais
+    runAsUser: 1000
+    command:
+      - python
+      - -m
+      - services.ais_collector
+    env:
+      - name: PYTHONPATH
+        value: /app/src
+    secretEnv:
+      DB_URL: oilfuel-analysis-pg-app/uri
+      AIS_API_KEY: oilfuel-analysis-ais
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi

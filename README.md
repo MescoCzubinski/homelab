@@ -11,7 +11,7 @@ Single-node Kubernetes homelab on a Mac Mini, run with k0s and managed by Argo C
 - **GitOps:** Argo CD ([argocd.md](.docs/argocd.md))
 - **Ingress:** Traefik, config in `infra/traefik/values.yaml`
 - **Public access:** Cloudflare Tunnel (`cloudflared`)
-- **Database:** CloudNativePG ([database.md](.docs/database.md))
+- **Database:** CloudNativePG, DuckDB ([database.md](.docs/database.md))
 - **Secrets:** Sealed Secrets
 - **Updates:** Renovate and Argo CD Image Updater ([argocd.md](.docs/argocd.md))
 
@@ -20,10 +20,11 @@ Single-node Kubernetes homelab on a Mac Mini, run with k0s and managed by Argo C
 ```
 .docs/                   docs and diagrams
 .github/                 CI workflows
-apps/                    public apps
+apps/                    own apps
   atlas/
   homepage/
   meetly/
+  oilfuel-analysis/
 charts/
   app/                   Helm chart for apps
 cluster/                 k0s config, static pods
@@ -32,6 +33,7 @@ infra/
   argocd-image-updater/  Image Updater
   cloudflared/           Cloudflare Tunnel
   cnpg/                  CloudNativePG, database storage
+  duckdb/                DuckDB storage
   sealed-secrets/        Sealed Secrets
   traefik/               Traefik, middlewares
 scripts/                 helper scripts, on PATH through flake.nix
@@ -45,7 +47,7 @@ tools/                   private tools
   syncthing/
 ```
 
-Each public app in `apps/` is a `values.yaml` for the shared `charts/app` Helm chart, plus `sealed-secret.yaml` if needed. Apps pin a chart version, published to GHCR when a `vX.Y.Z` tag matching `charts/app/Chart.yaml` is pushed.
+Each own app in `apps/` is a `values.yaml` for the shared `charts/app` Helm chart, plus `sealed-secret.yaml` if needed. Apps pin a chart version, published to GHCR when a `vX.Y.Z` tag matching `charts/app/Chart.yaml` is pushed.
 
 Each private tool in `tools/` has its own Application: a plain directory of manifests, or a `values.yaml` for an upstream chart where one exists.
 
@@ -64,6 +66,7 @@ Each private tool in `tools/` has its own Application: a plain directory of mani
 - [Beszel](https://beszel.dev) - server monitoring
 - [ConvertX](https://github.com/C4illin/ConvertX) - file converter
 - [Gatus](https://gatus.io) - status page and health checks
+- oilfuel-analysis - Student's project
 - [Stirling PDF](https://www.stirling.com) - PDF tools
 - [Syncthing](https://syncthing.net) - file sync
 - [Samba](https://www.samba.org) - network file share

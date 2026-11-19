@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: oilfuel-analysis
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  sources:
+    - repoURL: ghcr.io/mescoczubinski/charts
+      chart: app
+      targetRevision: 0.4.0
+      helm:
+        releaseName: oilfuel-analysis
+        valueFiles:
+          - $values/apps/oilfuel-analysis/values.yaml
+    - repoURL: git@github.com:MescoCzubinski/homelab.git
+      targetRevision: main
+      ref: values
+    - repoURL: git@github.com:MescoCzubinski/homelab.git
+      targetRevision: main
+      path: apps/oilfuel-analysis
+      directory:
+        include: "sealed-secret.yaml"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: oilfuel-analysis
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    managedNamespaceMetadata:
+      labels:
+        pod-security.kubernetes.io/enforce: restricted
+        pod-security.kubernetes.io/warn: restricted
+        pod-security.kubernetes.io/audit: restricted

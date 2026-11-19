@@ -34,6 +34,7 @@
 - [x] Discord webhooks — alerts from Gatus and Argo CD
 - [x] CI security — daily Trivy CVE scan with a dashboard issue, Gitleaks on every push, push protection
 - [x] Pod policies in CI — Kyverno CLI checks every workload, exceptions with reasons
+- [x] DuckDB per app — Quack server from the app's image, static PV, like Postgres
 - [x] API via VIP — kube-vip static pod, etcd stays on node IP
 - [ ] Terraform — OpenTofu state and CI
 - [ ] Cloudflare config in repo — DNS and tunnels (OpenTofu)
@@ -52,6 +53,7 @@
 - [x] Meetly
 - [x] Atlas
 - [x] Basic Memory
+- [x] Oilfuel Analysis
 - [ ] RustDesk
 - [ ] Sonarr, Radarr, Lidarr
 - [ ] AFFiNE

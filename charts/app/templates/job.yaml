@@ -1,0 +1,23 @@
+{{- range fromYamlArray (include "app.jobs" .) }}
+{{- $args := dict "root" $ "workload" . }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "app.labels" $args | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  template:
+    metadata:
+      labels:
+        {{- include "app.labels" $args | nindent 8 }}
+    spec:
+      restartPolicy: Never
+      {{- include "app.podSpec" $args | nindent 6 }}
+{{- end }}

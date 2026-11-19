@@ -9,7 +9,7 @@ GitOps repo for a single-node k0s cluster on a Mac Mini (node `myserver.home`, L
 No build. CI (`.github/workflows/validate.yaml`) renders every Helm-based Application and validates the output with kubeconform. It fails if `charts/app` differs from the chart published on GHCR under the same version. It also checks every workload (rendered and plain) against the Pod rules under [Security](#security) with the Kyverno CLI: policies and their exceptions in `.github/policies/pod-security.yaml`, requests and limits not checked. `.github/workflows/trivy.yaml` scans upstream images daily and lists every CRITICAL CVE that has a fix in one issue, `Vulnerability Dashboard`, closed when the list is empty (`apps/` images are skipped, their tags aren't in git). `.github/workflows/gitleaks.yaml` scans the git history on every push, `.gitleaks.toml` allows SealedSecret ciphertext. `.github/workflows/claude.yaml` answers `@claude` on PRs (Sonnet, may push obvious fixes), `.github/workflows/claude-review.yaml` reviews every push to a non-draft PR against `REVIEW.md` (Sonnet, comments only, skips Renovate and `.md`-only changes). `.github/workflows/claude-renovate.yaml` checks Renovate PRs for breaking changes and fails when one needs an edit or a manual step. To check locally:
 
 ```sh
-# charts/app with one app's values (repeat for atlas, homepage, meetly)
+# charts/app with one app's values (repeat for atlas, homepage, meetly, oilfuel-analysis)
 helm lint charts/app -n atlas -f apps/atlas/values.yaml
 helm template atlas charts/app -n atlas -f apps/atlas/values.yaml
 
@@ -18,10 +18,11 @@ kubeconform -strict -summary -ignore-missing-schemas -kubernetes-version 1.36.2 
   -ignore-filename-pattern 'values.yaml' -ignore-filename-pattern 'k0sctl.yaml' tools infra cluster
 ```
 
-Seal a secret with `scripts/create-secret.sh`, on `PATH` through `flake.nix` (direnv or `nix develop`), together with `kubectl`, `kubeseal`, `helm`, `kubeconform`, `k0sctl` and `openssl`. It creates or updates the namespace's `sealed-secret.yaml`. Leave out `value` for a hidden prompt, so the plaintext stays out of shell history. A new file deploys only if its Application's `directory.include` lists it.
+Seal a secret with `scripts/create-secret.sh`, on `PATH` through `flake.nix` (direnv or `nix develop`), together with `kubectl`, `kubeseal`, `helm`, `kubeconform`, `k0sctl` and `openssl`. It creates or updates the namespace's `sealed-secret.yaml`. Leave out `value` for a hidden prompt, so the plaintext stays out of shell history. `ghcr-pull` takes no key or value: the script copies it from a namespace that already has it. A new file deploys only if its Application's `directory.include` lists it.
 
 ```sh
 create-secret.sh <namespace> <name> [key] [value]
+create-secret.sh <namespace> ghcr-pull
 ```
 
 ## Architecture
@@ -32,24 +33,24 @@ create-secret.sh <namespace> <name> [key] [value]
 
 | tier     | how it's deployed                                                                 | access                         | Pod Security labels                  |
 | -------- | --------------------------------------------------------------------------------- | ------------------------------ | ------------------------------------ |
-| `apps/`  | `values.yaml` for the shared `charts/app` chart, Application pins a chart version | `public` via Cloudflare tunnel | `enforce`/`warn`/`audit: restricted` |
+| `apps/`  | `values.yaml` for the shared `charts/app` chart, Application pins a chart version | `public` via Cloudflare tunnel, or none (no Ingress) | `enforce`/`warn`/`audit: restricted` |
 | `tools/` | upstream chart + `values.yaml` where one exists, else plain manifests             | VPN only                       | `warn`/`audit: restricted`           |
 | `infra/` | upstream chart or plain manifests                                                 | n/a                            | `warn`/`audit: baseline`             |
 
 The labels are set through the Application's `managedNamespaceMetadata`. Tools keep data in `hostPath` under `/home/server/<tool>/`, use `strategy: Recreate` and `revisionHistoryLimit: 3`.
 
-**`charts/app`.** A list of `components`, each rendered as a Deployment + Service. The Ingress routes each component's `paths` on `host` (default `<release>.czubinski.dev`). `access` (`public`/`vpn`/`github`) picks the Traefik entrypoint and middleware. `values.schema.json` has `additionalProperties: false`, so a new value needs a schema entry. `secretEnv` maps `ENV: secret` or `ENV: secret/key`. The root fs is read-only: `/tmp` is an `emptyDir`, and `writablePaths` adds one `emptyDir` per path. The chart also ships the app's NetworkPolicies, so app policies are changed here, not in `apps/`.
+**`charts/app`.** A list of `components`, each rendered as a Deployment, plus a Service when it has a `port`. A top-level `image` is the default for every component and job, `command` overrides the image's entrypoint. `jobs` render as Argo `Sync` hook Jobs (migrations), wave `1`, and then the Deployments move to wave `2`. The Ingress routes each component's `paths` on `host` (default `<release>.czubinski.dev`). `access` (`public`/`vpn`/`github`) picks the Traefik entrypoint and middleware. `values.schema.json` has `additionalProperties: false`, so a new value needs a schema entry. `secretEnv` maps `ENV: secret` or `ENV: secret/key`. The root fs is read-only: `/tmp` is an `emptyDir`, and `writablePaths` adds one `emptyDir` per path. The chart also ships the app's NetworkPolicies (`nobody-to-<app>` instead of `traefik-to-<app>` when no component has a `port`), so app policies are changed here, not in `apps/`.
 
 **Traffic.** Public: Cloudflare → `cloudflared` → Traefik entrypoint `public`. Private: WireGuard → Traefik `websecure` (HTTP, middleware `default-http-vpn-only@kubernetescrd`) or a TCP entrypoint from `infra/traefik/values.yaml` (`IngressRouteTCP` with middleware `tcp-vpn-only` from namespace `default`). The Argo CD webhook is the one `public` route with a middleware (`http-gh-only`, GitHub IP ranges only). Details: `.docs/network.md`.
 
-**NetworkPolicies.** Every namespace is default-deny, plus one policy per allowed path, named `<source>-to-<target>` (`traefik-to-gatus`, `atlas-to-dns`, `nobody-to-<ns>` is the deny). Ingress policies live in the target's namespace, egress policies in the source's. Public apps also get egress limits: DNS, own namespace and the internet, but not RFC1918 ranges.
+**NetworkPolicies.** Every namespace is default-deny, plus one policy per allowed path, named `<source>-to-<target>` (`traefik-to-gatus`, `atlas-to-dns`, `nobody-to-<ns>` is the deny). Ingress policies live in the target's namespace, egress policies in the source's. Apps also get egress limits: DNS, own namespace and the internet, but not RFC1918 ranges.
 
 **Updates.** Two separate paths, which must not overlap:
 
 - `apps/`: Argo CD Image Updater moves image tags to the newest `vX.Y.Z` on GHCR and writes them to the Application as `helm.parameters`, not to git. `tag: v0.0.1` in `values.yaml` is only a baseline, and Renovate is disabled for `apps/**`.
 - Everything else: Renovate PRs (majors any time, minors and action digests on the 1st of the month, patches any time and automerged by rebase once checks pass, 3-day minimum release age). `renovate.json` rewrites commit messages to follow the commit conventions below. If a new package's name doesn't match its directory/Application name, add a `commitMessageTopic` packageRule.
 
-**Postgres.** `postgres: true` in an app's values creates a CNPG `Cluster` `<app>-pg` (credentials in the generated `<app>-pg-app` secret, used via `secretEnv`) and its NetworkPolicies. It also needs a static PV in `infra/cnpg/persistentvolumes.yaml` (`claimRef` `<app>/<app>-pg-1`, path `/home/server/postgres/<app>` created by hand on the host) and `sync-wave: "1"` on the Application. Details: `.docs/database.md`.
+**Postgres.** `postgres: true` in an app's values creates a CNPG `Cluster` `<app>-pg` (credentials in the generated `<app>-pg-app` secret, used via `secretEnv`) and its NetworkPolicies. It also needs a static PV in `infra/cnpg/persistentvolumes.yaml` (`claimRef` `<app>/<app>-pg-1`, path `/home/server/postgres/<app>` created by hand on the host) and `sync-wave: "1"` on the Application. `duckdb.image` and `duckdb.port` add a Quack server `<app>-duckdb` on that port from the app's own server image (uid `1000`, reads `QUACK_PORT` and `QUACK_TOKEN`, data in `/data` on a PVC), `Recreate`, its own NetworkPolicies and the token from the SealedSecret `<app>-duckdb` (key `token`). It needs a static PV in `infra/duckdb/persistentvolumes.yaml` (`claimRef` `<app>/<app>-duckdb`, path `/home/server/duckdb/<app>`). Details: `.docs/database.md`.
 
 **Sync waves.** SealedSecrets `-1`, default `0` (operators such as `cnpg`), Applications with `postgres: true` `1`.
 
@@ -69,7 +70,7 @@ A new tool comes with all of these:
 - Renovate coverage (an image under `tools/` is picked up automatically, a chart in its Application too)
 - the docs listed under [Docs](#docs)
 
-A `charts/app` change bumps `Chart.yaml` `version` and must render with the values of atlas, homepage and meetly.
+A `charts/app` change bumps `Chart.yaml` `version` and must render with the values of atlas, homepage, meetly and oilfuel-analysis.
 
 `.coderabbit.yaml` and `REVIEW.md` (Claude Code Review) hold the same review rules. A change to one goes into the other in the same commit.
 
@@ -78,7 +79,7 @@ A `charts/app` change bumps `Chart.yaml` `version` and must render with the valu
 Make every change as secure as the component allows, especially in `tools/`. Flag anything that grows the attack surface or blast radius:
 
 - Ingress always names its entrypoint. `public` only for public apps, everything else VPN-only through the middlewares above.
-- Pods: `runAsNonRoot`, `allowPrivilegeEscalation: false`, `capabilities.drop: [ALL]`, `seccompProfile: RuntimeDefault`, `readOnlyRootFilesystem: true` with `emptyDir` for writable paths where the image allows it, `automountServiceAccountToken: false` unless the pod has its own ServiceAccount, requests and limits.
+- Pods: `runAsNonRoot`, `allowPrivilegeEscalation: false`, `capabilities.drop: [ALL]`, `seccompProfile: RuntimeDefault`, `readOnlyRootFilesystem: true` with `emptyDir` for writable paths where the image allows it, `automountServiceAccountToken: false` unless the pod has its own ServiceAccount. Requests and limits on every component and job of an app in `apps/`, set in its `values.yaml`, never hardcoded in `charts/app`. Infra, tools and the database servers (Postgres, DuckDB) have none.
 - `hostNetwork`, `hostPID`, `hostIPC`, `hostPath` outside `/home/server/`, `hostPort`, `privileged` or added capabilities need a stated reason, as a `PolicyException` in `.github/policies/pod-security.yaml` (current ones: beszel agent `hostNetwork`, `hostPID` and read-only `/proc`, `/sys`, samba running as root with added capabilities, Traefik `hostPort`s, kube-vip static pod with `hostNetwork`, root, `NET_ADMIN`/`NET_RAW` and the admin kubeconfig).
 - Secrets only as SealedSecrets, never in `values.yaml`, `env` or plain Secrets.
 - Images and charts pinned to a version, never `latest`.
@@ -89,7 +90,7 @@ Make every change as secure as the component allows, especially in `tools/`. Fla
 
 After any change, check whether `README.md`, `.docs/*.md` or `.docs/TODO.md` describe what you changed, and update them in the same change. Keep their terse style.
 
-- README body links only to `.docs/` documents. Repo paths go in backticks, no external links. The Services section is the exception: public apps link to their live URL, tools to their project page.
+- README body links only to `.docs/` documents. Repo paths go in backticks, no external links. The Services section is the exception: public apps link to their live URL, tools to their project page, own apps without a public URL have no link.
 - `.docs/images/*.png` are diagrams that can't be edited here. If a change makes one outdated, tell the user.
 
 ### Commits
@@ -100,7 +101,7 @@ Messages are lowercase, with no trailing period. `{name}` is the app or director
 - **Update, no bump:** `{name}: {changes}`, e.g. `gatus: networkpolicies`. No `v{version}`, because the commit changes no version. Also used for things without a version, e.g. `kubelet: worker profile`
 - **Update and bump:** `{name} v{version}: {changes}`, e.g. `cloudflared v2026.10.3: read-only fs`
 - **Init:** `{name} v{version}: init`, e.g. `gatus v1.5.0: init`. `{version}` is the version the app starts with, or the first version tracked in the repo if it started on `latest`
-- **Init, own app:** `{name} v0.0.1: init`, e.g. `atlas v0.0.1: init`. Own apps (atlas, homepage, meetly) always start at `v0.0.1`
+- **Init, own app:** `{name} v0.0.1: init`, e.g. `atlas v0.0.1: init`. Own apps (atlas, homepage, meetly, oilfuel-analysis) always start at `v0.0.1`
 - **Init, no version:** `{name}: init`, e.g. `namespaces: init`. For plain resources without a version
 - **Several tools:** `tools: {changes}`, e.g. `tools: recreate strategy`. For a change to the `tools/` directory as a whole (sometimes cloudflared). A change to one tool uses that tool's name
 - **CI, Renovate, CodeRabbit, `REVIEW.md`:** `ci: {changes}`, e.g. `ci: renovate commit format`

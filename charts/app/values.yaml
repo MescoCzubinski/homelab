@@ -16,4 +16,6 @@ securityContext:
     drop:
       - ALL
 
+jobs: []
+
 components: []
